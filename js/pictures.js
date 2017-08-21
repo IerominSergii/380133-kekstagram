@@ -81,13 +81,13 @@ cropForm.classList.add('hidden');
 var galleryElement = document.querySelector('.gallery-overlay');
 
 // функция добавления картинки в gallery-форму
-var addPictureToGallery = function (pictureToGallery, gallery) {
+var showPicture = function (pictureToGallery, gallery) {
   gallery.querySelector('.gallery-overlay-image').src = pictureToGallery.url;
   gallery.querySelector('.likes-count').textContent = pictureToGallery.likes;
   gallery.querySelector('.comments-count').textContent = pictureToGallery.commentsCount;
 };
 
 // вставляю в .gallery-overlay первую картинку из массива .pictures
-addPictureToGallery(pictures[0], galleryElement);
+showPicture(pictures[0], galleryElement);
 
 galleryElement.classList.remove('hidden');
