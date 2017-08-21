@@ -3,21 +3,18 @@ var similarPictureTemplate = document.querySelector('#picture-template');
 var similarListElement = document.querySelector('.pictures');
 
 // функция генерации случайных чисел от min до max
-var randomInteger = function (min, max) {
-  var rand = min + Math.random() * (max + 1 - min);
-  rand = Math.floor(rand);
-  return rand;
+var getRandomInt = function (min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
 };
 
-// функция генерации случайных чисел в зависимости от длины массива
-var randomProperty = function (arr) {
-  var rand = Math.random() * arr.length;
-  rand = Math.floor(rand);
-  return rand;
+// функция генерации случайных данных в зависимости от длины массива
+// max - это значение свойства length массива
+var randomProperty = function (max) {
+  return Math.floor(Math.random() * max);
 };
 
 // массив комментариев
-var commentsArr = [
+var comments = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. ' +
@@ -30,39 +27,39 @@ var commentsArr = [
   'избивают. Как можно было поймать такой неудачный момент?!',
 ];
 
+var picturesAmount = 25; // количество картинок
+var likesMin = 15; // минимальное количество лайков
+var likesMax = 200; // максимальное количество лайков
+
 // функция создания массива из 25 картинок - объектов
-var createArr = function (commentsArray) {
-  var arr = [];
-  for (var i = 1; i <= 25; i++) { // на каждом этапе создаю объект и задаю свойства
+var createPictures = function (commentsArray, likesMinimum, likesMaximum, picturesNumber) {
+  var picturesArray = [];
+  for (var i = 1; i <= picturesNumber; i++) { // на каждом этапе создаю объект и задаю свойства
     var object = {};
     object.url = 'photos/' + i + '.jpg';
-    object.likes = randomInteger(15, 200);
-    if (Math.round(Math.random())) { // одно или два случайных комментария
-      object.comments = commentsArray[randomProperty(commentsArray)]; // один комментарий
-    } else {
-      var firstComment = commentsArray[randomProperty(commentsArray)]; // иначе два комментария
-      // проверка на повторение одинаковых комментариев
-      do {
-        var secondComment = commentsArray[randomProperty(commentsArray)];
-      } while (secondComment === firstComment);
-      object.comments = firstComment + '<br>' + secondComment;
+    object.likes = getRandomInt(likesMinimum, likesMaximum);
+    object.comments = comments[randomProperty(comments.length)]; // один комментарий
+    object.commentsCount = 1;
+    if (Math.round(Math.random())) { // добавление второго комментария с вероятностью 50%
+      object.comments += '<br>' + comments[randomProperty(comments.length)];
+      object.commentsCount = 2;
     }
 
-    arr.push(object);
+    picturesArray.push(object);
   }
 
-  return arr;
+  return picturesArray;
 };
 
 // создаю массив из картинок
-var pictures = createArr(commentsArr);
+var pictures = createPictures(comments, likesMin, likesMax, picturesAmount);
 
 // функция создания DOM-элементов на основе #picture-template
-var renderPicture = function (arr) {
+var renderPicture = function (shot) {
   var pictureElement = similarPictureTemplate.content.cloneNode(true);
-  pictureElement.querySelector('.picture').children[0].setAttribute('src', arr.url);
-  pictureElement.querySelector('.picture-likes').textContent = arr.likes;
-  pictureElement.querySelector('.picture-comments').textContent = arr.comments;
+  pictureElement.querySelector('img').setAttribute('src', shot.url);
+  pictureElement.querySelector('.picture-likes').textContent = shot.likes;
+  pictureElement.querySelector('.picture-comments').textContent = shot.commentsCount;
 
   return pictureElement;
 };
@@ -80,11 +77,17 @@ similarListElement.appendChild(fragment);
 var cropForm = document.querySelector('.upload-overlay');
 cropForm.classList.add('hidden');
 
-// заполняю данными .gallery-overlay
-// из первого элемента массива .pictures
+// "нахожу" элемент .gallery-overlay, в который потом добалю картинку
 var galleryElement = document.querySelector('.gallery-overlay');
-galleryElement.querySelector('.gallery-overlay-image').src = pictures[0].url;
-galleryElement.querySelector('.likes-count').textContent = pictures[0].likes;
-galleryElement.querySelector('.comments-count').innerHTML = pictures[0].comments;
 
-galleryElement.classList.remove('hidden'); // в задании нужно убрать класс invisible, но его там нет
+// функция добавления картинки в gallery-форму
+var addPictureToGallery = function (pictureToGallery, gallery) {
+  gallery.querySelector('.gallery-overlay-image').src = pictureToGallery.url;
+  gallery.querySelector('.likes-count').textContent = pictureToGallery.likes;
+  gallery.querySelector('.comments-count').textContent = pictureToGallery.commentsCount;
+};
+
+// вставляю в .gallery-overlay первую картинку из массива .pictures
+addPictureToGallery(pictures[0], galleryElement);
+
+galleryElement.classList.remove('hidden');
