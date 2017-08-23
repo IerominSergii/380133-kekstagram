@@ -1,3 +1,4 @@
+// Сообщи о начале работы над module4-task1
 'use strict';
 var similarPictureTemplate = document.querySelector('#picture-template');
 var similarListElement = document.querySelector('.pictures');
