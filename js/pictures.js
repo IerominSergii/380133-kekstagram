@@ -1,7 +1,6 @@
-// Сообщи о начале работы над module4-task1
 'use strict';
 var similarPictureTemplate = document.querySelector('#picture-template');
-var similarListElement = document.querySelector('.pictures');
+var picturesList = document.querySelector('.pictures');
 
 // функция генерации случайных чисел от min до max
 var getRandomInt = function (min, max) {
@@ -71,24 +70,67 @@ for (var i = 0; i < pictures.length; i++) {
   fragment.appendChild(renderPicture(pictures[i]));
 }
 
-// перемещаю fragment в .pictures
-similarListElement.appendChild(fragment);
-
-// скрываю форму кадрирования изображения upload-overlay
+// функция скрытия формы кадрирования изображения upload-overlay
 var cropForm = document.querySelector('.upload-overlay');
-cropForm.classList.add('hidden');
 
-// "нахожу" элемент .gallery-overlay, в который потом добалю картинку
+// "нахожу" элемент .gallery-overlay, в который потом добавлю картинку
 var galleryElement = document.querySelector('.gallery-overlay');
 
-// функция добавления картинки в gallery-форму
-var showPicture = function (pictureToGallery, gallery) {
-  gallery.querySelector('.gallery-overlay-image').src = pictureToGallery.url;
-  gallery.querySelector('.likes-count').textContent = pictureToGallery.likes;
-  gallery.querySelector('.comments-count').textContent = pictureToGallery.commentsCount;
+// ---------- module4 ----------
+// Показ/скрытие картинки в галерее
+var galleryCloseCross = galleryElement.querySelector('.gallery-overlay-close');
+
+// ---------- обработчики событий ----------
+// функция закрытия галереи
+var galleryClose = function () {
+  galleryElement.classList.add('hidden');
+  picturesList.addEventListener('click', onPictureClick);
+  galleryCloseCross.removeEventListener('click', onCloseCrossClick);
 };
 
-// вставляю в .gallery-overlay первую картинку из массива .pictures
-showPicture(pictures[0], galleryElement);
+// функция открытия галереи
+var galleryOpen = function () {
+  galleryElement.classList.remove('hidden');
+  picturesList.removeEventListener('click', onPictureClick);
+  galleryCloseCross.addEventListener('click', onCloseCrossClick);
+};
 
-galleryElement.classList.remove('hidden');
+// функция добавления картинки в галерею
+var setPictureToGallery = function (pict) {
+  var pictureSource = pict.querySelector('img').getAttribute('src');
+  var pictureLikes = pict.querySelector('.picture-likes').textContent;
+  var pictureComments = pict.querySelector('.picture-comments').textContent;
+
+  galleryElement.querySelector('.gallery-overlay-image').setAttribute('src', pictureSource);
+  galleryElement.querySelector('.likes-count').textContent = pictureLikes;
+  galleryElement.querySelector('.comments-count').textContent = pictureComments;
+};
+
+// функция клика на картинке
+var onPictureClick = function (evt) {
+  var targetClick = evt.target;
+
+  while (targetClick !== picturesList) {
+    if (targetClick.classList.contains('picture')) {
+      setPictureToGallery(targetClick);
+      galleryOpen();
+
+    }
+
+    targetClick = targetClick.parentElement;
+  }
+};
+
+// функция закрытия галереи на клике по крестику
+var onCloseCrossClick = function () {
+  galleryClose();
+};
+
+// перемещаю fragment в .pictures
+picturesList.appendChild(fragment);
+
+// скрываю форму кадрирования изображения upload-overlay
+cropForm.classList.add('hidden');
+
+// обработка клика по картинкам
+picturesList.addEventListener('click', onPictureClick);
