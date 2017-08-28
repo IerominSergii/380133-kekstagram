@@ -77,6 +77,10 @@ var cropForm = document.querySelector('.upload-overlay');
 var galleryElement = document.querySelector('.gallery-overlay');
 
 // ---------- module4 ----------
+// объявляю константы со значениями клавиш
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+
 // Показ/скрытие картинки в галерее
 var galleryCloseCross = galleryElement.querySelector('.gallery-overlay-close');
 
@@ -85,14 +89,22 @@ var galleryCloseCross = galleryElement.querySelector('.gallery-overlay-close');
 var galleryClose = function () {
   galleryElement.classList.add('hidden');
   picturesList.addEventListener('click', onPictureClick);
-  galleryCloseCross.removeEventListener('click', onCloseCrossClick);
+  picturesList.addEventListener('keydown', onCrossEnterPress);
+  galleryCloseCross.removeEventListener('click', onCrossClick);
+  galleryCloseCross.removeEventListener('keydown', onCrossEnterPress);
+  document.removeEventListener('keydown', onGalleryEscPress);
+  picturesList.addEventListener('keydown', onPictureEnterPress);
 };
 
 // функция открытия галереи
 var galleryOpen = function () {
   galleryElement.classList.remove('hidden');
   picturesList.removeEventListener('click', onPictureClick);
-  galleryCloseCross.addEventListener('click', onCloseCrossClick);
+  picturesList.removeEventListener('keydown', onCrossEnterPress);
+  galleryCloseCross.addEventListener('click', onCrossClick);
+  galleryCloseCross.addEventListener('keydown', onCrossEnterPress);
+  document.addEventListener('keydown', onGalleryEscPress);
+  picturesList.removeEventListener('keydown', onPictureEnterPress);
 };
 
 // функция добавления картинки в галерею
@@ -114,16 +126,44 @@ var onPictureClick = function (evt) {
     if (targetClick.classList.contains('picture')) {
       setPictureToGallery(targetClick);
       galleryOpen();
-
+      break;
     }
 
     targetClick = targetClick.parentElement;
   }
 };
 
-// функция закрытия галереи на клике по крестику
-var onCloseCrossClick = function () {
+// функция ЗАКРЫТИЯ галереи по КЛИКУ по крестике
+var onCrossClick = function () {
   galleryClose();
+};
+
+// функция ЗАКРЫТИЯ галереи по нажатию ENTER на КРЕСТИКЕ
+var onCrossEnterPress = function (evt) {
+  var keyCode = evt.keyCode;
+  var targetClick = evt.target;
+  if (keyCode === ENTER_KEYCODE && targetClick.classList.contains('gallery-overlay-close')) {
+    galleryClose();
+  }
+};
+
+// функция ЗАКРЫТИЯ галереи по нажатию ESC
+var onGalleryEscPress = function (evt) {
+  var keyCode = evt.keyCode;
+  if (keyCode === ESC_KEYCODE) {
+    galleryClose();
+  }
+};
+
+// функция нажатия ENTER на картинку .picture,
+// заполнение галереи данными картинки и открытие галереи
+var onPictureEnterPress = function (evt) {
+  var keyCode = evt.keyCode;
+  var targetClick = evt.target;
+  if (keyCode === ENTER_KEYCODE && targetClick.classList.contains('picture')) {
+    setPictureToGallery(targetClick);
+    galleryOpen();
+  }
 };
 
 // перемещаю fragment в .pictures
@@ -132,5 +172,11 @@ picturesList.appendChild(fragment);
 // скрываю форму кадрирования изображения upload-overlay
 cropForm.classList.add('hidden');
 
-// обработка клика по картинкам
+// обработка клика по картинкам (.picture)
 picturesList.addEventListener('click', onPictureClick);
+
+// обработка нажатия ENTER, при фокусе на картинке (.picture)
+picturesList.addEventListener('keydown', onPictureEnterPress);
+
+// обработка нажатия ENTER, при фокусе на картинке (.picture)
+galleryElement.addEventListener('keydown', onCrossEnterPress);
