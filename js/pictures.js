@@ -40,6 +40,7 @@ var createPictures = function (commentsArray, likesMinimum, likesMaximum, pictur
     object.likes = getRandomInt(likesMinimum, likesMaximum);
     object.comments = comments[randomProperty(comments.length)]; // один комментарий
     object.commentsCount = 1;
+    object.tabindex = i + 1;
     if (Math.round(Math.random())) { // добавление второго комментария с вероятностью 50%
       object.comments += '<br>' + comments[randomProperty(comments.length)];
       object.commentsCount = 2;
@@ -60,6 +61,7 @@ var renderPicture = function (shot) {
   pictureElement.querySelector('img').setAttribute('src', shot.url);
   pictureElement.querySelector('.picture-likes').textContent = shot.likes;
   pictureElement.querySelector('.picture-comments').textContent = shot.commentsCount;
+  pictureElement.querySelector('.picture').setAttribute('tabindex', shot.tabindex);
 
   return pictureElement;
 };
@@ -83,6 +85,9 @@ var ENTER_KEYCODE = 13;
 
 // Показ/скрытие картинки в галерее
 var galleryCloseCross = galleryElement.querySelector('.gallery-overlay-close');
+
+// добавление tabindex на крестик в галерее
+galleryCloseCross.setAttribute('tabindex', '0');
 
 // ---------- обработчики событий ----------
 // функция закрытия галереи
@@ -120,6 +125,7 @@ var setPictureToGallery = function (pict) {
 
 // функция клика на картинке
 var onPictureClick = function (evt) {
+  evt.preventDefault();
   var targetClick = evt.target;
 
   while (targetClick !== picturesList) {
@@ -140,9 +146,11 @@ var onCrossClick = function () {
 
 // функция ЗАКРЫТИЯ галереи по нажатию ENTER на КРЕСТИКЕ
 var onCrossEnterPress = function (evt) {
+
   var keyCode = evt.keyCode;
   var targetClick = evt.target;
   if (keyCode === ENTER_KEYCODE && targetClick.classList.contains('gallery-overlay-close')) {
+    evt.preventDefault();
     galleryClose();
   }
 };
@@ -161,6 +169,7 @@ var onPictureEnterPress = function (evt) {
   var keyCode = evt.keyCode;
   var targetClick = evt.target;
   if (keyCode === ENTER_KEYCODE && targetClick.classList.contains('picture')) {
+    evt.preventDefault();
     setPictureToGallery(targetClick);
     galleryOpen();
   }
