@@ -40,7 +40,7 @@ var createPictures = function (commentsArray, likesMinimum, likesMaximum, pictur
     object.likes = getRandomInt(likesMinimum, likesMaximum);
     object.comments = comments[randomProperty(comments.length)]; // один комментарий
     object.commentsCount = 1;
-    object.tabindex = i + 1;
+    object.tabindex = 0;
     if (Math.round(Math.random())) { // добавление второго комментария с вероятностью 50%
       object.comments += '<br>' + comments[randomProperty(comments.length)];
       object.commentsCount = 2;
