@@ -145,7 +145,6 @@ var onCrossClick = function () {
 
 // функция ЗАКРЫТИЯ галереи по нажатию ENTER на КРЕСТИКЕ
 var onCrossEnterPress = function (evt) {
-
   var keyCode = evt.keyCode;
   var targetClick = evt.target;
   if (keyCode === ENTER_KEYCODE && targetClick.classList.contains('gallery-overlay-close')) {
@@ -202,8 +201,11 @@ var uploadFileInput = uploadImage.querySelector('#upload-file');
 // форма кадрирования
 var uploadOverlay = uploadForm.querySelector('.upload-overlay');
 
-// кнопка .upload-form-cancel
+// крестик .upload-form-cancel
 var uploadCloseButton = uploadOverlay.querySelector('.upload-form-cancel');
+
+// кнопка Отправить
+var submitButton = uploadOverlay.querySelector('.upload-form-submit');
 
 // ---------- функции ----------
 // функция закрытия uploadImage
@@ -222,12 +224,19 @@ var openUploadImage = function () {
 var openUploadOverlay = function () {
   uploadOverlay.classList.remove('hidden');
   uploadFileInput.removeEventListener('change', onUploadFileChange);
+  document.addEventListener('keydown', pressEscToCloseOverlay);
+  uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
+  submitButton.addEventListener('keydown', onSubmitButtonEnterPress);
 };
 
 // функция закрытия uploadOverlay
 var closeUploadOverlay = function () {
   uploadOverlay.classList.add('hidden');
   uploadCloseButton.removeEventListener('click', onCloseButtonClick);
+  document.removeEventListener('keydown', pressEscToCloseOverlay);
+  uploadFileInput.addEventListener('change', onUploadFileChange);
+  uploadCloseButton.removeEventListener('keydown', pressEnterToCloseOverlay);
+  submitButton.removeEventListener('keydown', onSubmitButtonEnterPress);
 };
 
 // функция по изменению значния поля загрузки фото
@@ -243,9 +252,47 @@ var onCloseButtonClick = function () {
   openUploadImage();
 };
 
+// закрытие формы кадрирования uploadOverlay по нажатию ESC
+var pressEscToCloseOverlay = function (evt) {
+  evt.preventDefault();
+  if (evt.keyCode === ESC_KEYCODE && !uploadOverlay.classList.contains('hidden')) {
+    closeUploadOverlay();
+    openUploadImage();
+  }
+};
+
+// функция закрытия формы кадрирования uploadOverlay по нажатию ENTER
+var pressEnterToCloseOverlay = function (evt) {
+  evt.preventDefault();
+  if (evt.keyCode === ENTER_KEYCODE) {
+    closeUploadOverlay();
+  }
+};
+
+// функция генерации клика
+var doClick = new Event('click');
+
+// функция генерации клика на нажатию ENTER на кнопке Отправить
+var onSubmitButtonEnterPress = function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    submitButton.dispatchEvent(doClick);
+  }
+};
+
+// ---------- добавление аттрибутов ----------
+// добавление tabindex на крестик в галерее
+uploadCloseButton.setAttribute('tabindex', '0');
+
+// добавление tabindex на кнопку Отправить
+submitButton.setAttribute('tabindex', '0');
+
 // ---------- обработчики событий ----------
 // событие - изменение значения поля загрузки фотографии #upload-file
 uploadFileInput.addEventListener('change', onUploadFileChange);
 
 // событие - нажатие на кнопку .upload-form-cancel
 uploadCloseButton.addEventListener('click', onCloseButtonClick);
+
+// закрытие формы кадрирования uploadOverlay по нажатию ENTER
+// если фокус на крестике .upload-form-cancel
+uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
