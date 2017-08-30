@@ -237,9 +237,10 @@ var onUploadFileChange = function (evt) {
   openUploadOverlay();
 };
 
-//
+// функция по клику на кнопку закрытия
 var onCloseButtonClick = function () {
   closeUploadOverlay();
+  openUploadImage();
 };
 
 // ---------- обработчики событий ----------
