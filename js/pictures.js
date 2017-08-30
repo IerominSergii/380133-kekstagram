@@ -1,4 +1,3 @@
-// Сообщи о начале работы над module4-task2
 'use strict';
 var similarPictureTemplate = document.querySelector('#picture-template');
 var picturesList = document.querySelector('.pictures');
@@ -73,13 +72,12 @@ for (var i = 0; i < pictures.length; i++) {
   fragment.appendChild(renderPicture(pictures[i]));
 }
 
-// функция скрытия формы кадрирования изображения upload-overlay
+// форма кадрирования изображения upload-overlay
 var cropForm = document.querySelector('.upload-overlay');
 
 // "нахожу" элемент .gallery-overlay, в который потом добавлю картинку
 var galleryElement = document.querySelector('.gallery-overlay');
 
-// ---------- module4 ----------
 // объявляю константы со значениями клавиш
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
@@ -190,3 +188,63 @@ picturesList.addEventListener('keydown', onPictureEnterPress);
 
 // обработка нажатия ENTER, при фокусе на картинке (.picture)
 galleryElement.addEventListener('keydown', onCrossEnterPress);
+
+// ---------- объекты ----------
+// общая форма
+var uploadForm = document.querySelector('.upload-form');
+
+// форма загрузки изображения <div class="upload-image">
+var uploadImage = uploadForm.querySelector('.upload-image');
+
+// форма загрузки файла input id="upload-file"
+var uploadFileInput = uploadImage.querySelector('#upload-file');
+
+// форма кадрирования
+var uploadOverlay = uploadForm.querySelector('.upload-overlay');
+
+// кнопка .upload-form-cancel
+var uploadCloseButton = uploadOverlay.querySelector('.upload-form-cancel');
+
+// ---------- функции ----------
+// функция закрытия uploadImage
+var closeUploadImage = function () {
+  uploadImage.classList.add('hidden');
+  uploadFileInput.addEventListener('change', onUploadFileChange);
+};
+
+// функция открытия uploadImage
+var openUploadImage = function () {
+  uploadImage.classList.remove('hidden');
+  uploadCloseButton.addEventListener('click', onCloseButtonClick);
+};
+
+// функция открытия uploadOverlay
+var openUploadOverlay = function () {
+  uploadOverlay.classList.remove('hidden');
+  uploadFileInput.removeEventListener('change', onUploadFileChange);
+};
+
+// функция закрытия uploadOverlay
+var closeUploadOverlay = function () {
+  uploadOverlay.classList.add('hidden');
+  uploadCloseButton.removeEventListener('click', onCloseButtonClick);
+};
+
+// функция по изменению значния поля загрузки фото
+var onUploadFileChange = function (evt) {
+  evt.preventDefault();
+  closeUploadImage();
+  openUploadOverlay();
+};
+
+//
+var onCloseButtonClick = function () {
+  closeUploadOverlay();
+};
+
+// ---------- обработчики событий ----------
+// событие - изменение значения поля загрузки фотографии #upload-file
+uploadFileInput.addEventListener('change', onUploadFileChange);
+
+// событие - нажатие на кнопку .upload-form-cancel
+uploadCloseButton.addEventListener('click', onCloseButtonClick);
