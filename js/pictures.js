@@ -337,15 +337,25 @@ var effectInputs = effectsBlock.querySelectorAll('input');
 var onFilterClick = function (evt) {
   var target = evt.target;
 
-  for (var k = 0; k < effectsBlock.length; k++) {
-    while (target !== effectsBlock) {
-      if (target === effectInputs[k]) {
-        var filterClassName = effectInputs[k].getAttribute('className');
-        var filterName = filterClassName.substring(7);
+  for (var k = 0; k < effectInputs.length; k++) {
+    // название CSS класса - это id фильтра без префикса upload-
+    var filterClassName = effectInputs[k].getAttribute('id');
+    var filterName = filterClassName.substring(7);
+
+    // если уже есть фильтр - то убираю его
+    if (previewPicture.classList.contains(filterName)) {
+      previewPicture.classList.remove(filterName);
+    }
+
+    // поиск события-клика на конкретном фильтре
+    if (target === effectInputs[k]) {
+      // ограничиваю "всплытие" формой с эффектами
+      while (target !== effectsBlock) {
         previewPicture.classList.add(filterName);
         break;
       }
 
+      // поднимаюсь выше по DOM-дереву
       target = target.parentElement;
     }
   }
