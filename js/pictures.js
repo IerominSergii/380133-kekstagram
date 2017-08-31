@@ -83,7 +83,7 @@ var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
 var COMMENT_MIN_LENGTH = 30;// минимальная длина комментария — 30 символов
 var COMMENT_MAX_LENGTH = 100;// максимальная длина комментария — 100 символов
-var RESIZE_CONTROL_STEP = '25%';// Шаг — 25% для формы ввода масштаба
+var RESIZE_CONTROL_STEP = '25%';// шаг — 25% для формы ввода масштаба
 
 // Показ/скрытие картинки в галерее
 var galleryCloseCross = galleryElement.querySelector('.gallery-overlay-close');
@@ -236,6 +236,7 @@ var openUploadOverlay = function () {
   document.addEventListener('keydown', pressEscToCloseOverlay);
   uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
   submitButton.addEventListener('keydown', onSubmitButtonEnterPress);
+  effectsBlock.addEventListener('click', onFilterClick);// снимаю событие с блока эффектов
 };
 
 // функция закрытия uploadOverlay
@@ -246,6 +247,7 @@ var closeUploadOverlay = function () {
   uploadFileInput.addEventListener('change', onUploadFileChange);
   uploadCloseButton.removeEventListener('keydown', pressEnterToCloseOverlay);
   submitButton.removeEventListener('keydown', onSubmitButtonEnterPress);
+  effectsBlock.removeEventListener('click', onFilterClick);// вешаю событие на блок эффектов
 };
 
 // функция по изменению значния поля загрузки фото
@@ -306,7 +308,7 @@ uploadComment.setAttribute('minlength', COMMENT_MIN_LENGTH);
 // максимальная длина комментария — 100 символов
 uploadComment.setAttribute('maxlength', COMMENT_MAX_LENGTH);
 
-// Шаг — 25% для формы ввода масштаба
+// шаг — 25% для формы ввода масштаба
 resizeControl.setAttribute('step', RESIZE_CONTROL_STEP);
 
 // ---------- обработчики событий ----------
@@ -319,3 +321,32 @@ uploadCloseButton.addEventListener('click', onCloseButtonClick);
 // закрытие формы кадрирования uploadOverlay по нажатию ENTER
 // если фокус на крестике .upload-form-cancel
 uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
+
+// ---------- 4 Применение эффекта к изображению ----------
+// основная картинка в форме загрузки .upload-form-preview
+var previewPicture = document.querySelector('.effect-image-preview');
+
+// блок эффектов
+var effectsBlock = uploadOverlay.querySelector('.upload-effect-controls');
+
+// коллекция input форм с эффектами
+var effectInputs = effectsBlock.querySelectorAll('input');
+
+// функция 'поимки' клика на блоке эффектов и
+// применение эффекта к изображению (через делегирование)
+var onFilterClick = function (evt) {
+  var target = evt.target;
+
+  for (var k = 0; k < effectsBlock.length; k++) {
+    while (target !== effectsBlock) {
+      if (target === effectInputs[k]) {
+        var filterClassName = effectInputs[k].getAttribute('className');
+        var filterName = filterClassName.substring(7);
+        previewPicture.classList.add(filterName);
+        break;
+      }
+
+      target = target.parentElement;
+    }
+  }
+};
