@@ -78,9 +78,12 @@ var cropForm = document.querySelector('.upload-overlay');
 // "нахожу" элемент .gallery-overlay, в который потом добавлю картинку
 var galleryElement = document.querySelector('.gallery-overlay');
 
-// объявляю константы со значениями клавиш
+// константы
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
+var COMMENT_MIN_LENGTH = 30;// минимальная длина комментария — 30 символов
+var COMMENT_MAX_LENGTH = 100;// максимальная длина комментария — 100 символов
+var RESIZE_CONTROL_STEP = '25%';// Шаг — 25% для формы ввода масштаба
 
 // Показ/скрытие картинки в галерее
 var galleryCloseCross = galleryElement.querySelector('.gallery-overlay-close');
@@ -207,6 +210,12 @@ var uploadCloseButton = uploadOverlay.querySelector('.upload-form-cancel');
 // кнопка Отправить
 var submitButton = uploadOverlay.querySelector('.upload-form-submit');
 
+// форма ввода комментария
+var uploadComment = uploadOverlay.querySelector('.upload-form-description');
+
+// форма ввода масштаба
+var resizeControl = uploadOverlay.querySelector('.upload-resize-controls-value');
+
 // ---------- функции ----------
 // функция закрытия uploadImage
 var closeUploadImage = function () {
@@ -254,8 +263,10 @@ var onCloseButtonClick = function () {
 
 // закрытие формы кадрирования uploadOverlay по нажатию ESC
 var pressEscToCloseOverlay = function (evt) {
-  evt.preventDefault();
-  if (evt.keyCode === ESC_KEYCODE && !uploadOverlay.classList.contains('hidden')) {
+  if (evt.keyCode === ESC_KEYCODE && evt.target !== uploadComment) {
+    // нажата клавиша ESC?
+    // если фокус находится на форме ввода комментария, то форма не закрывается
+    evt.preventDefault();
     closeUploadOverlay();
     openUploadImage();
   }
@@ -279,12 +290,24 @@ var onSubmitButtonEnterPress = function (evt) {
   }
 };
 
-// ---------- добавление аттрибутов ----------
+// ---------- добавление атрибутов ----------
 // добавление tabindex на крестик в галерее
 uploadCloseButton.setAttribute('tabindex', '0');
 
 // добавление tabindex на кнопку Отправить
 submitButton.setAttribute('tabindex', '0');
+
+// форма ввода комментария - обязательное поле
+uploadComment.setAttribute('required', 'required');
+
+// минимальная длина комментария — 30 символов
+uploadComment.setAttribute('minlength', COMMENT_MIN_LENGTH);
+
+// максимальная длина комментария — 100 символов
+uploadComment.setAttribute('maxlength', COMMENT_MAX_LENGTH);
+
+// Шаг — 25% для формы ввода масштаба
+resizeControl.setAttribute('step', RESIZE_CONTROL_STEP);
 
 // ---------- обработчики событий ----------
 // событие - изменение значения поля загрузки фотографии #upload-file
