@@ -191,7 +191,7 @@ picturesList.addEventListener('keydown', onPictureEnterPress);
 // обработка нажатия ENTER, при фокусе на картинке (.picture)
 galleryElement.addEventListener('keydown', onCrossEnterPress);
 
-// ---------- объекты ----------
+// ---------- переменные ----------
 // общая форма
 var uploadForm = document.querySelector('.upload-form');
 
@@ -236,7 +236,9 @@ var openUploadOverlay = function () {
   document.addEventListener('keydown', pressEscToCloseOverlay);
   uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
   submitButton.addEventListener('keydown', onSubmitButtonEnterPress);
-  effectsBlock.addEventListener('click', onFilterClick);// снимаю событие с блока эффектов
+  effectsBlock.addEventListener('click', onFilterClick);// вешаю событие с блока эффектов
+  resizeInc.addEventListener('click', onResizeIncClick);// вешаю клик по кнопке "+"
+  resizeDec.addEventListener('click', onResizeDecClick);// вешаю клик по кнопке "-"
 };
 
 // функция закрытия uploadOverlay
@@ -247,7 +249,9 @@ var closeUploadOverlay = function () {
   uploadFileInput.addEventListener('change', onUploadFileChange);
   uploadCloseButton.removeEventListener('keydown', pressEnterToCloseOverlay);
   submitButton.removeEventListener('keydown', onSubmitButtonEnterPress);
-  effectsBlock.removeEventListener('click', onFilterClick);// вешаю событие на блок эффектов
+  effectsBlock.removeEventListener('click', onFilterClick);// снимаю событие на блок эффектов
+  resizeInc.removeEventListener('click', onResizeIncClick);// снимаю клик по кнопке "+"
+  resizeDec.removeEventListener('click', onResizeDecClick);// снимаю клик по кнопке "-"
 };
 
 // функция по изменению значния поля загрузки фото
@@ -323,6 +327,11 @@ uploadCloseButton.addEventListener('click', onCloseButtonClick);
 uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
 
 // ---------- 4 Применение эффекта к изображению ----------
+// ---------- константа ----------
+// название CSS класса - это название фильтра без префикса 'upload-'
+var PREFIX = 'upload-';
+
+// ---------- переменные ----------
 // основная картинка в форме загрузки .upload-form-preview
 var previewPicture = document.querySelector('.effect-image-preview');
 
@@ -332,6 +341,7 @@ var effectsBlock = uploadOverlay.querySelector('.upload-effect-controls');
 // коллекция input форм с эффектами
 var effectInputs = effectsBlock.querySelectorAll('input');
 
+// ---------- функции ----------
 // функция 'поимки' клика на блоке эффектов и
 // применение эффекта к изображению (через делегирование)
 var onFilterClick = function (evt) {
@@ -340,7 +350,7 @@ var onFilterClick = function (evt) {
   for (var k = 0; k < effectInputs.length; k++) {
     // название CSS класса - это id фильтра без префикса upload-
     var filterClassName = effectInputs[k].getAttribute('id');
-    var filterName = filterClassName.substring(7);
+    var filterName = filterClassName.substring(PREFIX.length);
 
     // если уже есть фильтр - то убираю его
     if (previewPicture.classList.contains(filterName)) {
@@ -359,4 +369,60 @@ var onFilterClick = function (evt) {
       target = target.parentElement;
     }
   }
+};
+
+// ---------- 5 Изменение масштаба изображения ----------
+// ---------- константы ----------
+// минимальное значение масштаба изображения
+var MIN_IMAGE_SCALE = 25;
+
+// максимальное значение масштаба изображения
+var MAX_IMAGE_SCALE = 100;
+
+// шаг изменения масштаба изображения
+var RESIZE_STEP = 25;
+
+// ---------- переменные ----------
+// кнопка увеличения масштаба изображения
+var resizeInc = cropForm.querySelector('.upload-resize-controls-button-inc');
+
+// кнопка уменьшения масштаба изображения
+var resizeDec = cropForm.querySelector('.upload-resize-controls-button-dec');
+
+// масштаб изображения. parseInt() - для того чтобы отсечь '%'
+var resizeValue = parseInt(resizeControl.value, 10);
+
+// ---------- функции ----------
+// изменение масштаба
+var zoomPicture = function (image, scaleValue) {
+  var scaleRightFormat = ('scale(' + (parseInt(scaleValue, 10) / 100) + ')');
+  image.setAttribute('transform', scaleRightFormat);
+};
+
+// функция увеличения масштаба изображения
+var onResizeIncClick = function (evt) {
+  evt.preventDefault();
+  if ((resizeValue + RESIZE_STEP) <= MAX_IMAGE_SCALE) {
+    resizeValue = resizeValue + RESIZE_STEP;
+    resizeControl.setAttribute('value', resizeValue + '%');
+  } else {
+    resizeValue = MAX_IMAGE_SCALE;
+    resizeControl.setAttribute('value', resizeValue + '%');
+  }
+
+  zoomPicture(previewPicture, resizeControl.value);
+};
+
+// функция уменьшения масштаба изображения
+var onResizeDecClick = function (evt) {
+  evt.preventDefault();
+  if ((resizeValue - RESIZE_STEP) > MIN_IMAGE_SCALE) {
+    resizeValue = resizeValue - RESIZE_STEP;
+    resizeControl.setAttribute('value', resizeValue + '%');
+  } else {
+    resizeValue = MIN_IMAGE_SCALE;
+    resizeControl.setAttribute('value', resizeValue + '%');
+  }
+
+  zoomPicture(previewPicture, resizeControl.value);
 };
