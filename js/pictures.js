@@ -402,27 +402,27 @@ var zoomPicture = function (image, scaleValue) {
 // функция увеличения масштаба изображения
 var onResizeIncClick = function (evt) {
   evt.preventDefault();
+
   if ((resizeValue + RESIZE_STEP) <= MAX_IMAGE_SCALE) {
     resizeValue = resizeValue + RESIZE_STEP;
-    resizeControl.setAttribute('value', resizeValue + '%');
   } else {
     resizeValue = MAX_IMAGE_SCALE;
-    resizeControl.setAttribute('value', resizeValue + '%');
   }
 
+  resizeControl.setAttribute('value', resizeValue + '%');
   zoomPicture(previewPicture, resizeControl.value);
 };
 
 // функция уменьшения масштаба изображения
 var onResizeDecClick = function (evt) {
   evt.preventDefault();
+
   if ((resizeValue - RESIZE_STEP) > MIN_IMAGE_SCALE) {
     resizeValue = resizeValue - RESIZE_STEP;
-    resizeControl.setAttribute('value', resizeValue + '%');
   } else {
     resizeValue = MIN_IMAGE_SCALE;
-    resizeControl.setAttribute('value', resizeValue + '%');
   }
 
+  resizeControl.setAttribute('value', resizeValue + '%');
   zoomPicture(previewPicture, resizeControl.value);
 };
