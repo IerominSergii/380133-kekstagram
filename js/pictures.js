@@ -382,6 +382,10 @@ var MAX_IMAGE_SCALE = 100;
 // шаг изменения масштаба изображения
 var RESIZE_STEP = 25;
 
+// ---------- добавление атрибутов ----------
+// значение масштаба по умолчанию — 100%
+resizeControl.setAttribute('value', '100%');
+
 // ---------- переменные ----------
 // кнопка увеличения масштаба изображения
 var resizeInc = cropForm.querySelector('.upload-resize-controls-button-inc');
@@ -396,7 +400,7 @@ var resizeValue = parseInt(resizeControl.value, 10);
 // изменение масштаба
 var zoomPicture = function (image, scaleValue) {
   var scaleRightFormat = ('scale(' + (parseInt(scaleValue, 10) / 100) + ')');
-  image.setAttribute('transform', scaleRightFormat);
+  image.style.transform = scaleRightFormat;
 };
 
 // функция увеличения масштаба изображения
