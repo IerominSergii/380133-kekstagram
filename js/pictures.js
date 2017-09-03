@@ -239,10 +239,19 @@ var openUploadOverlay = function () {
   effectsBlock.addEventListener('click', onFilterClick);// вешаю событие с блока эффектов
   resizeInc.addEventListener('click', onResizeIncClick);// вешаю клик по кнопке "+"
   resizeDec.addEventListener('click', onResizeDecClick);// вешаю клик по кнопке "-"
-  // убираю красную рамку на поле ввода комментария - если она есть
-  if (inputHashtag.style.border === RED_BORDER) {
-    removeRedBorder();
-  }
+  // вешаю обработчик клика на кнопку отправки формы
+  submitButton.addEventListener('click', validateFormCustom);
+
+  // снимаю обработчик очистки поля хэш-тегов при открытии окна uploadOverlay
+  uploadFileInput.removeEventListener('click', clearInputHashtag);
+
+  // вешаю обработчик - убираю красную рамку пока в поле вводятся комментарии
+  // поле валидно по-умолчанию
+  uploadComment.addEventListener('click', becameValidDefault);
+
+  // вешаю обработчик - убрать красную рамку по нажатию на кнопку Отправить
+  // если комменты валидны
+  submitButton.addEventListener('click', becameValidAfterSubmitClick);
 };
 
 // функция закрытия uploadOverlay
@@ -256,6 +265,19 @@ var closeUploadOverlay = function () {
   effectsBlock.removeEventListener('click', onFilterClick);// снимаю событие на блок эффектов
   resizeInc.removeEventListener('click', onResizeIncClick);// снимаю клик по кнопке "+"
   resizeDec.removeEventListener('click', onResizeDecClick);// снимаю клик по кнопке "-"
+  // снимаю обработчик клика на кнопку отправки формы
+  submitButton.removeEventListener('click', validateFormCustom);
+
+  // вешаю обработчик очистки поля хэш-тегов при закрытии окна uploadOverlay
+  uploadFileInput.addEventListener('click', clearInputHashtag);
+
+  // снимаю обработчик - убираю красную рамку пока в поле вводятся комментарии
+  // поле валидно по-умолчанию
+  uploadComment.removeEventListener('click', becameValidDefault);
+
+  // снимаю обработчик - убрать красную рамку по нажатию на кнопку Отправить
+  // если комменты валидны
+  submitButton.removeEventListener('click', becameValidAfterSubmitClick);
 };
 
 // функция по изменению значния поля загрузки фото
@@ -460,8 +482,10 @@ var deleteRepeatedHashtag = function (arr) {
     obj[str] = true; // запомнить строку в виде свойства объекта
   }
 
+  // массив названий свойств объекта
   var uniqueHashtags = Object.keys(obj);
 
+  // передаю в форму хэш-теги без повторений
   inputHashtag.value = uniqueHashtags.join(' ');
 };
 
@@ -497,7 +521,8 @@ var checkValidity = function (input, hashtagsArr) {
   // массив сообщений об ошибках
   var invalidities = [];
 
-  if (!hashtagsArr.every(isHashtag)) {
+  // input.value !== '' если форма пустая - идем дальше
+  if (!hashtagsArr.every(isHashtag) && input.value !== '') {
     invalidities.push('- Хэш-тег должен начинаться с символа \'#\'');
   }
 
@@ -524,17 +549,38 @@ var getInvalidities = function (arr) {
 };
 
 // функция добавления красной рамки
-var addRedBorder = function () {
-  uploadComment.style.border = RED_BORDER;
+var addRedBorder = function (elem) {
+  elem.style.border = RED_BORDER;
 };
 
 // функция удалния красной рамки
-var removeRedBorder = function () {
-  uploadComment.style.border = 'none';
+var removeRedBorder = function (elem) {
+  elem.style.border = 'none';
 };
 
-// обработчик клика на кнопку отправки формы
-submitButton.addEventListener('click', function (evt) {
+// делаю форму комментарие валидной по-умолчанию
+var becameValidDefault = function () {
+  // убираю красную рамку на поле ввода комментария - если она есть
+  if (uploadComment.style.border === RED_BORDER) {
+    removeRedBorder(uploadComment);
+  }
+};
+
+// удаляю красную рамку по нажатию на кнопку Отправить
+// если комменты валидны
+var becameValidAfterSubmitClick = function () {
+  if (uploadComment.validity.valid) {
+    removeRedBorder(uploadComment);
+  }
+};
+
+// функция очистки поля хэш-тегов после сабмита
+var clearInputHashtag = function () {
+  inputHashtag.value = '';
+};
+
+// функция валидации формы (хэш-тегов) - нестандартный валидации
+var validateFormCustom = function () {
 
   // запуск функции - удалаяем хэш-теги - дубликаты
   deleteRepeatedHashtag(inputHashtag.value.split(' '));
@@ -556,7 +602,7 @@ submitButton.addEventListener('click', function (evt) {
 
     // вешаю обработчик - после клика на кнопку Отправить
     // если поле невалидно - добавь красную рамку
-    uploadComment.addEventListener('invalid', addRedBorder);
+    uploadComment.addEventListener('invalid', addRedBorder(uploadComment));
   } else {
     // сброс значения обработчика валидации, если это значение стало корректно
     inputHashtag.setCustomValidity('');
@@ -565,11 +611,15 @@ submitButton.addEventListener('click', function (evt) {
     inputHashtag.style.border = 'none';
 
     // снимаю обработчик добавления красной рамки
-    uploadComment.removeEventListener('invalid', addRedBorder);
+    uploadComment.removeEventListener('invalid', addRedBorder(uploadComment));
   }
-});
+};
 
 // ---------- добавление атрибутов ----------
 uploadForm.setAttribute('action', 'https://1510.dump.academy/kekstagram');
 uploadForm.setAttribute('method', 'post');
 uploadForm.setAttribute('enctype', 'multipart/form-data');
+
+// ---------- обработчики событий ----------
+// вешаю обработчик очистки поля хэш-тегов
+uploadFileInput.addEventListener('click', clearInputHashtag);
