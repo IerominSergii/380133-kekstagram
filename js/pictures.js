@@ -55,6 +55,20 @@ var createPictures = function (commentsArray, likesMinimum, likesMaximum, pictur
 // создаю массив из картинок
 var pictures = createPictures(comments, likesMin, likesMax, picturesAmount);
 
+// массив комментариев
+var commentEndings = ['комментарий', 'комментария', 'комментариев'];
+
+// функция изменения слова 'комментариев' (каррирование)
+var changeCommentEnding = function (count, titles) {
+  if (count % 10 === 1 && count % 100 !== 11) {
+    return titles[0];
+  } else if (count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20)) {
+    return titles[1];
+  } else {
+    return titles[2];
+  }
+};
+
 // функция создания DOM-элементов на основе #picture-template
 var renderPicture = function (shot) {
   var pictureElement = similarPictureTemplate.content.cloneNode(true);
@@ -77,6 +91,9 @@ var cropForm = document.querySelector('.upload-overlay');
 
 // "нахожу" элемент .gallery-overlay, в который потом добавлю картинку
 var galleryElement = document.querySelector('.gallery-overlay');
+
+// контейнер для надписи 'комментариев' в галерее
+var galleryCommentText = galleryElement.querySelector('.gallery-overlay-controls-comments');
 
 // константы
 var ESC_KEYCODE = 27;
@@ -123,6 +140,12 @@ var setPictureToGallery = function (pict) {
   galleryElement.querySelector('.gallery-overlay-image').setAttribute('src', pictureSource);
   galleryElement.querySelector('.likes-count').textContent = pictureLikes;
   galleryElement.querySelector('.comments-count').textContent = pictureComments;
+
+  // удаляю слово 'комментариев'
+  galleryCommentText.textContent = galleryCommentText.textContent.slice(0, -12);
+
+  // добавляю соответствующее количеству комментариев слово
+  galleryCommentText.textContent += changeCommentEnding(pictureComments, commentEndings);
 };
 
 // функция клика на картинке
