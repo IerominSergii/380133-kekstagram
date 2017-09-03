@@ -239,6 +239,10 @@ var openUploadOverlay = function () {
   effectsBlock.addEventListener('click', onFilterClick);// вешаю событие с блока эффектов
   resizeInc.addEventListener('click', onResizeIncClick);// вешаю клик по кнопке "+"
   resizeDec.addEventListener('click', onResizeDecClick);// вешаю клик по кнопке "-"
+  // убираю красную рамку на поле ввода комментария - если она есть
+  if (inputHashtag.style.border === RED_BORDER) {
+    removeRedBorder();
+  }
 };
 
 // функция закрытия uploadOverlay
@@ -430,3 +434,142 @@ var onResizeDecClick = function (evt) {
   resizeControl.setAttribute('value', resizeValue + '%');
   zoomPicture(previewPicture, resizeControl.value);
 };
+
+// ---------- 6 Хэш-теги ----------
+// ---------- константы ----------
+// максимальное количество хэш-тегов
+var HASHTAG_MAX_AMOUNT = 5;
+
+// максимальная длина хэш-тега
+var HASHTAG_MAX_LENGTH = 20;
+
+// красная рамка
+var RED_BORDER = '3px solid red';
+
+// ---------- переменные ----------
+// поле ввода хэш-тегов
+var inputHashtag = cropForm.querySelector('.upload-form-hashtags');
+
+// ---------- функции ----------
+// функция удаление повторяющихся хэш-тегов
+var deleteRepeatedHashtag = function (arr) {
+  var obj = {};
+
+  for (var j = 0; j < arr.length; j++) {
+    var str = arr[j].toLowerCase();
+    obj[str] = true; // запомнить строку в виде свойства объекта
+  }
+
+  var uniqueHashtags = Object.keys(obj);
+
+  inputHashtag.value = uniqueHashtags.join(' ');
+};
+
+// массив хэш-тегов из input
+var hashtags = function (input) {
+  return input.value.split(' ');
+};
+
+// проверка на наличие решетки в начале хэш-тега
+var isHashtag = function (elem) {
+  return elem[0] === '#' ? true : false;
+};
+
+// проверка! разделены ли хэш-теги пробелами
+// проверку начинаю со второй позиции [1] (т.к. первая - это #),
+// elem.indexOf('#', 1) === -1 означает, что второго '#' - нет
+var didHashtagsSeparete = function (elem) {
+  return elem.indexOf('#', 1) === -1 ? true : false;
+};
+
+// проверка! не более HASHTAG_MAX_AMOUNT хэш-тегов
+var checkHashtagAmount = function (arr) {
+  return arr.length > HASHTAG_MAX_AMOUNT ? false : true;
+};
+
+// проверка! максимальная длина хэш-тега - HASHTAG_MAX_LENGTH
+var checkHashtagLength = function (elem) {
+  return elem.length <= HASHTAG_MAX_LENGTH;
+};
+
+// проверка на валидность
+var checkValidity = function (input, hashtagsArr) {
+  // массив сообщений об ошибках
+  var invalidities = [];
+
+  if (!hashtagsArr.every(isHashtag)) {
+    invalidities.push('- Хэш-тег должен начинаться с символа \'#\'');
+  }
+
+  if (!hashtagsArr.every(didHashtagsSeparete)) {
+    invalidities.push('- Хэш-теги должны быть разделены пробелами');
+  }
+
+  if (!hashtagsArr.every(checkHashtagLength)) {
+    invalidities.push('- Максимальная длина одного хэш-тега ' + HASHTAG_MAX_LENGTH + ' символов');
+  }
+
+  if (!checkHashtagAmount(hashtagsArr)) {
+    invalidities.push('- Нельзя указать больше ' + HASHTAG_MAX_AMOUNT + ' хэш-тегов');
+  }
+
+  // если форма валидна функция checkValidity вернет массив сообщений об ошибках
+  // иначе вернет false
+  return invalidities.length > 0 ? invalidities : false;
+};
+
+// общий текст сообщений об ошибках
+var getInvalidities = function (arr) {
+  return arr.join('; \n');
+};
+
+// функция добавления красной рамки
+var addRedBorder = function () {
+  uploadComment.style.border = RED_BORDER;
+};
+
+// функция удалния красной рамки
+var removeRedBorder = function () {
+  uploadComment.style.border = 'none';
+};
+
+// обработчик клика на кнопку отправки формы
+submitButton.addEventListener('click', function (evt) {
+
+  // запуск функции - удалаяем хэш-теги - дубликаты
+  deleteRepeatedHashtag(inputHashtag.value.split(' '));
+
+  // если форма не валидна, то
+  if (checkValidity(inputHashtag, hashtags(inputHashtag))) {
+
+    // массив сообщений об ошибках
+    var inputCustomValidation = checkValidity(inputHashtag, hashtags(inputHashtag));
+
+    // общий текст сообщений об ошибках
+    var customValidityMessage = getInvalidities(inputCustomValidation);
+
+    // специальное сообщение об ошибке
+    inputHashtag.setCustomValidity(customValidityMessage);
+
+    // выделяю неверное поле красной рамкой
+    inputHashtag.style.border = RED_BORDER;
+
+    // вешаю обработчик - после клика на кнопку Отправить
+    // если поле невалидно - добавь красную рамку
+    uploadComment.addEventListener('invalid', addRedBorder);
+  } else {
+    // сброс значения обработчика валидации, если это значение стало корректно
+    inputHashtag.setCustomValidity('');
+
+    // убираю красную рамку в поле
+    inputHashtag.style.border = 'none';
+
+    // снимаю обработчик добавления красной рамки
+    uploadComment.removeEventListener('invalid', addRedBorder);
+  }
+});
+
+// ---------- добавление атрибутов ----------
+uploadForm.setAttribute('action', 'https://1510.dump.academy/kekstagram');
+uploadForm.setAttribute('method', 'post');
+uploadForm.setAttribute('enctype', 'multipart/form-data');
