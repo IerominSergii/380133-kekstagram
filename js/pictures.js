@@ -95,6 +95,8 @@ var galleryElement = document.querySelector('.gallery-overlay');
 // контейнер для надписи 'комментариев' в галерее
 var galleryCommentText = galleryElement.querySelector('.gallery-overlay-controls-comments');
 
+var initialGalleryCommentText = galleryCommentText.textContent;
+
 // константы
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
@@ -118,6 +120,7 @@ var galleryClose = function () {
   galleryCloseCross.removeEventListener('keydown', onCrossEnterPress);
   document.removeEventListener('keydown', onGalleryEscPress);
   picturesList.addEventListener('keydown', onPictureEnterPress);
+  galleryCommentText.textContent = initialGalleryCommentText;
 };
 
 // функция открытия галереи
@@ -145,7 +148,7 @@ var setPictureToGallery = function (pict) {
   galleryCommentText.textContent = galleryCommentText.textContent.slice(0, -12);
 
   // добавляю соответствующее количеству комментариев слово
-  galleryCommentText.textContent += changeCommentEnding(pictureComments, commentEndings);
+  galleryCommentText.textContent = galleryCommentText.textContent + changeCommentEnding(pictureComments, commentEndings);
 };
 
 // функция клика на картинке
