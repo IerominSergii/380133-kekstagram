@@ -55,20 +55,6 @@ var createPictures = function (commentsArray, likesMinimum, likesMaximum, pictur
 // создаю массив из картинок
 var pictures = createPictures(comments, likesMin, likesMax, picturesAmount);
 
-// массив комментариев
-var commentEndings = ['комментарий', 'комментария', 'комментариев'];
-
-// функция изменения слова 'комментариев' (каррирование)
-var changeCommentEnding = function (count, titles) {
-  if (count % 10 === 1 && count % 100 !== 11) {
-    return titles[0];
-  } else if (count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20)) {
-    return titles[1];
-  } else {
-    return titles[2];
-  }
-};
-
 // функция создания DOM-элементов на основе #picture-template
 var renderPicture = function (shot) {
   var pictureElement = similarPictureTemplate.content.cloneNode(true);
