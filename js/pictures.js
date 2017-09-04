@@ -242,9 +242,6 @@ var openUploadOverlay = function () {
   // вешаю обработчик клика на кнопку отправки формы
   submitButton.addEventListener('click', validateFormCustom);
 
-  // снимаю обработчик очистки поля хэш-тегов при открытии окна uploadOverlay
-  uploadFileInput.removeEventListener('click', clearInputHashtag);
-
   // вешаю обработчик - убираю красную рамку пока в поле вводятся комментарии
   // поле валидно по-умолчанию
   uploadComment.addEventListener('click', becameValidDefault);
@@ -252,6 +249,9 @@ var openUploadOverlay = function () {
   // вешаю обработчик - убрать красную рамку по нажатию на кнопку Отправить
   // если комменты валидны
   submitButton.addEventListener('click', becameValidAfterSubmitClick);
+
+  // вешаю обработчик очистки формы
+  uploadForm.addEventListener('submit', resetForm);
 };
 
 // функция закрытия uploadOverlay
@@ -268,9 +268,6 @@ var closeUploadOverlay = function () {
   // снимаю обработчик клика на кнопку отправки формы
   submitButton.removeEventListener('click', validateFormCustom);
 
-  // вешаю обработчик очистки поля хэш-тегов при закрытии окна uploadOverlay
-  uploadFileInput.addEventListener('click', clearInputHashtag);
-
   // снимаю обработчик - убираю красную рамку пока в поле вводятся комментарии
   // поле валидно по-умолчанию
   uploadComment.removeEventListener('click', becameValidDefault);
@@ -278,6 +275,9 @@ var closeUploadOverlay = function () {
   // снимаю обработчик - убрать красную рамку по нажатию на кнопку Отправить
   // если комменты валидны
   submitButton.removeEventListener('click', becameValidAfterSubmitClick);
+
+  // снимаю обработчик очистки формы
+  uploadForm.removeEventListener('submit', resetForm);
 };
 
 // функция по изменению значния поля загрузки фото
@@ -574,9 +574,11 @@ var becameValidAfterSubmitClick = function () {
   }
 };
 
-// функция очистки поля хэш-тегов после сабмита
-var clearInputHashtag = function () {
-  inputHashtag.value = '';
+// функция очистки формы после сабмита
+var resetForm = function () {
+  if (uploadForm.validity.valid) {
+    uploadForm.reset();
+  }
 };
 
 // функция валидации формы (хэш-тегов) - нестандартный валидации
@@ -619,7 +621,3 @@ var validateFormCustom = function () {
 uploadForm.setAttribute('action', 'https://1510.dump.academy/kekstagram');
 uploadForm.setAttribute('method', 'post');
 uploadForm.setAttribute('enctype', 'multipart/form-data');
-
-// ---------- обработчики событий ----------
-// вешаю обработчик очистки поля хэш-тегов
-uploadFileInput.addEventListener('click', clearInputHashtag);
