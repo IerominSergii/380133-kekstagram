@@ -148,7 +148,7 @@ var setPictureToGallery = function (pict) {
   galleryCommentText.textContent = galleryCommentText.textContent.slice(0, -12);
 
   // добавляю соответствующее количеству комментариев слово
-  galleryCommentText.textContent = galleryCommentText.textContent + changeCommentEnding(pictureComments, commentEndings);
+  galleryCommentText.textContent += changeCommentEnding(pictureComments, commentEndings);
 };
 
 // функция клика на картинке
