@@ -281,25 +281,25 @@
   // максимальная длина хэш-тега
   var HASHTAG_MAX_LENGTH = 20;
 
-  // красная рамка
-  var RED_BORDER = '3px solid red';
+  // стиль невалидной формы
+  var INVALID_FORM = '3px solid red';
 
   // ---------- переменные ----------
   // поле ввода хэш-тегов
   var inputHashtag = document.querySelector('.upload-form-hashtags');
 
   // ---------- функции ----------
-  // функция удаление повторяющихся хэш-тегов
-  var deleteRepeatedHashtag = function (arr) {
-    var obj = {};
+  // функция, которая удаляет повторяющиеся хэш-теги
+  var deleteRepeatedHashtag = function (enteredHashtags) {
+    var hashtagsWithoutRepetitions = {};
 
-    for (var j = 0; j < arr.length; j++) {
-      var str = arr[j].toLowerCase();
-      obj[str] = true; // запомнить строку в виде свойства объекта
+    for (var j = 0; j < enteredHashtags.length; j++) {
+      var str = enteredHashtags[j].toLowerCase();
+      hashtagsWithoutRepetitions[str] = true; // запомнить строку в виде свойства объекта
     }
 
     // массив названий свойств объекта
-    var uniqueHashtags = Object.keys(obj);
+    var uniqueHashtags = Object.keys(hashtagsWithoutRepetitions);
 
     // передаю в форму хэш-теги без повторений
     inputHashtag.value = uniqueHashtags.join(' ');
@@ -324,7 +324,7 @@
 
   // проверка! не более HASHTAG_MAX_AMOUNT хэш-тегов
   var checkHashtagAmount = function (arr) {
-    return arr.length > HASHTAG_MAX_AMOUNT ? false : true;
+    return arr.length <= HASHTAG_MAX_AMOUNT;
   };
 
   // проверка! максимальная длина хэш-тега - HASHTAG_MAX_LENGTH
@@ -364,21 +364,21 @@
     return arr.join('; \n');
   };
 
-  // функция добавления красной рамки
-  var addRedBorder = function (elem) {
-    elem.style.border = RED_BORDER;
+  // функция, которая показывает, что форма невалидна
+  var showInvalid = function (elem) {
+    elem.style.border = INVALID_FORM;
   };
 
-  // функция удалния красной рамки
-  var removeRedBorder = function (elem) {
+  // функция, которая убирает у формы невалидный вид
+  var hideInvalid = function (elem) {
     elem.style.border = 'none';
   };
 
   // делаю форму комментарие валидной по-умолчанию
   var becameValidDefault = function () {
     // убираю красную рамку на поле ввода комментария - если она есть
-    if (uploadComment.style.border === RED_BORDER) {
-      removeRedBorder(uploadComment);
+    if (uploadComment.style.border === INVALID_FORM) {
+      hideInvalid(uploadComment);
     }
   };
 
@@ -386,7 +386,7 @@
   // если комменты валидны
   var becameValidAfterSubmitClick = function () {
     if (uploadComment.validity.valid) {
-      removeRedBorder(uploadComment);
+      hideInvalid(uploadComment);
     }
   };
 
@@ -416,11 +416,11 @@
       inputHashtag.setCustomValidity(customValidityMessage);
 
       // выделяю неверное поле красной рамкой
-      inputHashtag.style.border = RED_BORDER;
+      inputHashtag.style.border = INVALID_FORM;
 
       // вешаю обработчик - после клика на кнопку Отправить
       // если поле невалидно - добавь красную рамку
-      uploadComment.addEventListener('invalid', addRedBorder(uploadComment));
+      uploadComment.addEventListener('invalid', showInvalid(uploadComment));
     } else {
       // сброс значения обработчика валидации, если это значение стало корректно
       inputHashtag.setCustomValidity('');
@@ -429,7 +429,7 @@
       inputHashtag.style.border = 'none';
 
       // снимаю обработчик добавления красной рамки
-      uploadComment.removeEventListener('invalid', addRedBorder(uploadComment));
+      uploadComment.removeEventListener('invalid', showInvalid(uploadComment));
     }
   };
 
