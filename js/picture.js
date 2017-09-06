@@ -5,25 +5,32 @@
 
   window.picture = {
     // функция создания массива из picturesAmount картинок - объектов
-    createPictures: function (commentsArr, likesMinimum, likesMaximum, picturesNumber) {
+    createPictures: function (commentsArr, likesMin, likesMax, picturesAmount) {
       var picturesArray = [];
-      for (var i = 1; i <= picturesNumber; i++) { // на каждом этапе создаю объект и задаю свойства
-        var object = {};
-        object.url = 'photos/' + i + '.jpg';
-        object.likes = window.data.getRandomInt(likesMinimum, likesMaximum);
+      for (var i = 1; i <= picturesAmount; i++) { // на каждом этапе создаю объект и задаю свойства
+        var shotFeatures = {};
+
+        // случайное число в зависимости от длины массива
+        var randomNumber = window.data.randomProperty(commentsArr.length);
+
+        // случайное число от min до max
+        var randomMinMaxNumber = window.data.getRandomInt(likesMin, likesMax);
+
+        shotFeatures.url = 'photos/' + i + '.jpg';
+        shotFeatures.likes = randomMinMaxNumber;
 
         // один комментарий
-        object.comments = commentsArr[window.data.randomProperty(commentsArr.length)];
-        object.commentsCount = 1;
-        object.tabindex = 0;
+        shotFeatures.comments = commentsArr[randomNumber];
+        shotFeatures.commentsCount = 1;
+        shotFeatures.tabindex = 0;
 
         // добавление второго комментария с вероятностью 50%
         if (Math.round(Math.random())) {
-          object.comments += '<br>' + commentsArr[window.data.randomProperty(commentsArr.length)];
-          object.commentsCount = 2;
+          shotFeatures.comments += '<br>' + commentsArr[randomNumber];
+          shotFeatures.commentsCount = 2;
         }
 
-        picturesArray.push(object);
+        picturesArray.push(shotFeatures);
       }
 
       return picturesArray;
