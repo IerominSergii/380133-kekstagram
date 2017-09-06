@@ -2,20 +2,22 @@
 'use strict';
 
 (function () {
-  window.preview = {
-    // "нахожу" элемент .gallery-overlay, в который потом добавлю картинку
-    galleryElement: document.querySelector('.gallery-overlay'),
+  // "нахожу" элемент .gallery-overlay, в который потом добавлю картинку
+  var galleryElement = document.querySelector('.gallery-overlay');
 
+  window.preview = {
     // функция добавления картинки в галерею
     setPictureToGallery: function (pict) {
-      var pictureSource = pict.querySelector('img').getAttribute('src');
-      var pictureLikes = pict.querySelector('.picture-likes').textContent;
-      var pictureComments = pict.querySelector('.picture-comments').textContent;
+      // 'достаю' data- индекс из элемента
+      var index = pict.dataset.index;
 
-      var gallery = window.preview.galleryElement;
-      gallery.querySelector('.gallery-overlay-image').setAttribute('src', pictureSource);
-      gallery.querySelector('.likes-count').textContent = pictureLikes;
-      gallery.querySelector('.comments-count').textContent = pictureComments;
+      // по data- индексу передаю соответствующий элемент из массива в эту функцию
+      var shot = window.picture.pictures[index];
+
+      // отрисовываю превью
+      galleryElement.querySelector('.gallery-overlay-image').setAttribute('src', shot.url);
+      galleryElement.querySelector('.likes-count').textContent = shot.likes;
+      galleryElement.querySelector('.comments-count').textContent = shot.commentsCount;
     },
   };
 })();

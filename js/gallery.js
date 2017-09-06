@@ -2,21 +2,11 @@
 'use strict';
 
 (function () {
-  var likesMin = 15; // минимальное количество лайков
-  var likesMax = 200; // максимальное количество лайков
-
   var picturesList = document.querySelector('.pictures');
   var similarPictureTemplate = document.querySelector('#picture-template');
 
-  // создаю массив из картинок
-  var pictures = window.picture.createPictures(window.data.comments,
-      likesMin,
-      likesMax,
-      window.data.picturesAmount
-  );
-
   // функция создания DOM-элементов на основе #picture-template
-  var renderPicture = function (shot) {
+  var createPictureDomElement = function (shot) {
     var pictureElement = similarPictureTemplate.content.cloneNode(true);
     pictureElement.querySelector('img').setAttribute('src', shot.url);
     pictureElement.querySelector('.picture-likes').textContent = shot.likes;
@@ -26,10 +16,14 @@
     return pictureElement;
   };
 
-  // функция заполнения блока DOM-элементами на основе массива JS-объектов
+  // заполнению блок DOM-элементами на основе массива JS-объектов
   var fragment = document.createDocumentFragment();
-  for (var i = 0; i < pictures.length; i++) {
-    fragment.appendChild(renderPicture(pictures[i]));
+  for (var i = 0; i < window.picture.pictures.length; i++) {
+    var currentPicture = createPictureDomElement(window.picture.pictures[i]);
+
+    // добавляю картинке индекс - номер картинки в массиве
+    currentPicture.querySelector('.picture').dataset.index = i;
+    fragment.appendChild(currentPicture);
   }
 
   // перемещаю fragment в .pictures
@@ -38,8 +32,11 @@
   // форма кадрирования изображения upload-overlay
   var cropForm = document.querySelector('.upload-overlay');
 
+  // "нахожу" элемент .gallery-overlay, в который потом добавлю картинку
+  var galleryElement = document.querySelector('.gallery-overlay');
+
   // Показ/скрытие картинки в галерее
-  var galleryCloseCross = window.preview.galleryElement.querySelector('.gallery-overlay-close');
+  var galleryCloseCross = galleryElement.querySelector('.gallery-overlay-close');
 
   // добавление tabindex на крестик в галерее
   galleryCloseCross.setAttribute('tabindex', '0');
@@ -47,7 +44,7 @@
   // ---------- обработчики событий ----------
   // функция закрытия галереи
   var galleryClose = function () {
-    window.preview.galleryElement.classList.add('hidden');
+    galleryElement.classList.add('hidden');
     picturesList.addEventListener('click', onPictureClick);
     picturesList.addEventListener('keydown', onCrossEnterPress);
     galleryCloseCross.removeEventListener('click', onCrossClick);
@@ -58,7 +55,7 @@
 
   // функция открытия галереи
   var galleryOpen = function () {
-    window.preview.galleryElement.classList.remove('hidden');
+    galleryElement.classList.remove('hidden');
     picturesList.removeEventListener('click', onPictureClick);
     picturesList.removeEventListener('keydown', onCrossEnterPress);
     galleryCloseCross.addEventListener('click', onCrossClick);
@@ -130,5 +127,5 @@
   picturesList.addEventListener('keydown', onPictureEnterPress);
 
   // обработка нажатия ENTER, при фокусе на картинке (.picture)
-  window.preview.galleryElement.addEventListener('keydown', onCrossEnterPress);
+  galleryElement.addEventListener('keydown', onCrossEnterPress);
 })();

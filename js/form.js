@@ -1,4 +1,3 @@
-// Сообщи о начале работы с module5-task2
 // Файл form.js
 'use strict';
 
