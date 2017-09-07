@@ -454,17 +454,25 @@
       var moveEvtX = moveEvt.clientX;
       var shiftX = startCoordX - moveEvtX;
 
-      // var coverToPercent = function (shift, areaMin, areaMax) {
-      //   return parseFloat(shift * 100 / (areaMax - areaMin));
+      // var coverToPercent = function (offSetLeft, areaMin, areaMax) {
+      //   return offSetLeft * 100 / (areaMax - areaMin);
       // };
 
-      // var shiftPercent = coverToPercent(shiftX, 0, 455);
+      // var pinStyleLeftPercent = coverToPercent(pin.offsetLeft, 0, 455);
 
       startCoordX = moveEvtX;
 
-      pin.style.left = (pin.offsetLeft - shiftX) + 'px';
+      // pin.style.left = (pin.offsetLeft - shiftX) + 'px';
 
-      // pin.style.left = (parseFloat(pin.style.left, 10) + shiftPercent) + '%';
+      if ((pin.offsetLeft - shiftX) < 0) {
+        pin.style.left = 0 + 'px';
+      } else if ((pin.offsetLeft - shiftX) > 455) {
+        pin.style.left = 455 + 'px';
+      } else {
+        pin.style.left = (pin.offsetLeft - shiftX) + 'px';
+      }
+
+      // pin.style.left = (parseFloat(pin.style.left, 10) + pinStyleLeftPercent) + '%';
     };
 
     var onMouseUp = function (upEvt) {
