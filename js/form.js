@@ -439,29 +439,32 @@
   uploadForm.setAttribute('enctype', 'multipart/form-data');
 
   // ---------- pin move ----------
+  // @fix ширина ползунка - минус половину
   var pin = effectsBlock.querySelector('.upload-effect-level-pin');
 
   pin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
 
-    var startCoords = evt.clientX;
+    var startCoordX = evt.clientX;
 
+    // onMouseMove
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
-      var shiftX;
+      var moveEvtX = moveEvt.clientX;
+      var shiftX = startCoordX - moveEvtX;
 
-      if (moveEvt.clientX < 0) {
-        shiftX = startCoords + 0;
-      } else if (moveEvt.clientX > 455) {
-        shiftX = startCoords - 455;
-      } else {
-        shiftX = startCoords - moveEvt.clientX;
-      }
+      // var coverToPercent = function (shift, areaMin, areaMax) {
+      //   return parseFloat(shift * 100 / (areaMax - areaMin));
+      // };
 
-      startCoords = moveEvt.clientX;
+      // var shiftPercent = coverToPercent(shiftX, 0, 455);
+
+      startCoordX = moveEvtX;
 
       pin.style.left = (pin.offsetLeft - shiftX) + 'px';
+
+      // pin.style.left = (parseFloat(pin.style.left, 10) + shiftPercent) + '%';
     };
 
     var onMouseUp = function (upEvt) {
