@@ -437,4 +437,41 @@
   uploadForm.setAttribute('action', 'https://1510.dump.academy/kekstagram');
   uploadForm.setAttribute('method', 'post');
   uploadForm.setAttribute('enctype', 'multipart/form-data');
+
+  // ---------- pin move ----------
+  var pin = effectsBlock.querySelector('.upload-effect-level-pin');
+
+  pin.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+
+    var startCoords = evt.clientX;
+
+    var onMouseMove = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      var shiftX;
+
+      if (moveEvt.clientX < 0) {
+        shiftX = startCoords + 0;
+      } else if (moveEvt.clientX > 455) {
+        shiftX = startCoords - 455;
+      } else {
+        shiftX = startCoords - moveEvt.clientX;
+      }
+
+      startCoords = moveEvt.clientX;
+
+      pin.style.left = (pin.offsetLeft - shiftX) + 'px';
+    };
+
+    var onMouseUp = function (upEvt) {
+      upEvt.preventDefault();
+
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
 })();
