@@ -442,39 +442,83 @@
   // @fix ширина ползунка - минус половину
   var pin = effectsBlock.querySelector('.upload-effect-level-pin');
 
+  // перемещаю ползунок в начальное положение
+  // @fix повешать на открытие окна upload-overlay перемещение ползунка в начало
+  pin.style.left = '0%';
+
+  var convertToPx = function (pinStyleLeft, areaMin, areaMax) {
+    return (parseInt(pinStyleLeft, 10) * (areaMax - areaMin)) / 100;
+  };
+
   pin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
 
     var startCoordX = evt.clientX;
+
+    var areaStart = startCoordX;
+    if (parseInt(pin.style.left, 10)) {
+      areaStart = startCoordX - convertToPx(pin.style.left, 0, 456);
+    }
+
+    var areaEnd = areaStart + 456;// погрешность!!!
 
     // onMouseMove
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
       var moveEvtX = moveEvt.clientX;
-      var shiftX = startCoordX - moveEvtX;
+      var shiftX;
 
-      // var coverToPercent = function (offSetLeft, areaMin, areaMax) {
-      //   return offSetLeft * 100 / (areaMax - areaMin);
-      // };
+      var pinPositionInPx = null;
 
-      // var pinStyleLeftPercent = coverToPercent(pin.offsetLeft, 0, 455);
+      // Линия уровня эффекта, на которой расположен ползунок
+      var effectLevelLine = document.querySelector('.upload-effect-level-line');
 
-      startCoordX = moveEvtX;
+      // начальное значение позиции ползунка - начало линии уровня эффекта
+      var pinStartPosition = effectLevelLine.clientLeft;
 
-      // pin.style.left = (pin.offsetLeft - shiftX) + 'px';
+      // конечное значение позиции ползунка - конец линии уровня эффекта
+      var pinEndPosition = effectLevelLine.offsetWidth;
 
-      if ((pin.offsetLeft - shiftX) < 0) {
-        pin.style.left = 0 + 'px';
-      } else if ((pin.offsetLeft - shiftX) > 455) {
-        pin.style.left = 455 + 'px';
+      // функция нахождения позиции offSetLeft в процентном выражении в
+      // интервале между areaMin и areaMax
+      var convertToPercent = function (offSetLeft, areaMin, areaMax) {
+        return offSetLeft * 100 / (areaMax - areaMin);
+      };
+
+      // shiftX !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      if (moveEvtX < areaStart) {
+        shiftX = startCoordX - areaStart;
+      } else if (moveEvtX > areaEnd) {
+        shiftX = startCoordX - areaEnd;
       } else {
-        pin.style.left = (pin.offsetLeft - shiftX) + 'px';
+        shiftX = startCoordX - moveEvtX;
       }
 
-      // pin.style.left = (parseFloat(pin.style.left, 10) + pinStyleLeftPercent) + '%';
+      // позиция pin
+      if ((pin.offsetLeft - shiftX) < pinStartPosition) {
+        pinPositionInPx = pinStartPosition;
+      } else if ((pin.offsetLeft - shiftX) > pinEndPosition) {
+        pinPositionInPx = pinEndPosition;
+      } else {
+        pinPositionInPx = (pin.offsetLeft - shiftX);
+      }
+
+      // обновляю первоначальную точку
+      if (moveEvtX < areaStart) {
+        startCoordX = pinStartPosition;
+      } else if (moveEvtX > areaEnd) {
+        startCoordX = pinEndPosition;
+      } else {
+        startCoordX -= moveEvtX;
+      }
+
+      // перевожу значения px в % и задаю это значение в CSS left
+      pin.style.left = convertToPercent(pinPositionInPx, pinStartPosition, pinEndPosition) + '%';
     };
 
+    // функция: при отпускании клавиши мыши - снимаю обработчики событий:
+    // движение мыши onMouseMove и отпускание мыши onMouseUp
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
 
