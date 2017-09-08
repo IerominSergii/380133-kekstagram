@@ -32,6 +32,15 @@
   // форма ввода масштаба
   var resizeControl = uploadOverlay.querySelector('.upload-resize-controls-value');
 
+  // блок эффектов
+  var effectsBlock = uploadOverlay.querySelector('.upload-effect-controls');
+
+  // ползунок изменения эффекта картинки
+  var pin = effectsBlock.querySelector('.upload-effect-level-pin');
+
+  // линия эффекта картинки
+  var effectValue = effectsBlock.querySelector('.upload-effect-level-val');
+
   // ---------- функции ----------
   // функция закрытия uploadImage
   var closeUploadImage = function () {
@@ -68,6 +77,12 @@
 
     // вешаю обработчик очистки формы
     uploadForm.addEventListener('submit', resetForm);
+
+    // перемещаю ползунок в начальное положение при открытии окна
+    pin.style.left = '0%';
+
+    // задаю величине линии эффекта начальное значение 0%
+    effectValue.style.width = '0%';
   };
 
   // функция закрытия uploadOverlay
@@ -176,9 +191,6 @@
   // ---------- переменные ----------
   // основная картинка в форме загрузки .upload-form-preview
   var previewPicture = document.querySelector('.effect-image-preview');
-
-  // блок эффектов
-  var effectsBlock = uploadOverlay.querySelector('.upload-effect-controls');
 
   // коллекция input форм с эффектами
   var effectInputs = effectsBlock.querySelectorAll('input');
@@ -439,39 +451,42 @@
   uploadForm.setAttribute('enctype', 'multipart/form-data');
 
   // ---------- pin move ----------
-  // @fix ширина ползунка - минус половину
-  var pin = effectsBlock.querySelector('.upload-effect-level-pin');
-
-  // перемещаю ползунок в начальное положение
-  // @fix повешать на открытие окна upload-overlay перемещение ползунка в начало
-  pin.style.left = '0%';
-
+  // функция нахождения позиции pin.style.left в пиксельном выражении в
+  // интервале между areaMin (pinStartPosition) и areaMax (pinEndPosition)
   var convertToPx = function (pinStyleLeft, areaMin, areaMax) {
     return (parseInt(pinStyleLeft, 10) * (areaMax - areaMin)) / 100;
   };
 
+  // обработчик нажатия кнопки мыши на ползунке
   pin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
 
+    // запоминаю координату X точки, с которой начинаю перемещение ползунка
     var startCoordX = evt.clientX;
 
-    var areaStart = startCoordX;
+    var areaStart = startCoordX;// начало линии уровня эффекта
+
+    // если ползунок находится не на начальной позиции,
+    // то от areaStart отнимаю положение ползунка в 'px'
     if (parseInt(pin.style.left, 10)) {
       areaStart = startCoordX - convertToPx(pin.style.left, 0, 456);
     }
 
-    var areaEnd = areaStart + 456;// погрешность!!!
+    var areaEnd = areaStart + 456;// конец линии уровня эффекта
 
-    // onMouseMove
+    // при движении мыши:
+    // - обновляю смещение относительно первоначальной точки
+    // - меняю положение ползунка и линии уровня эффекта
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
-      var moveEvtX = moveEvt.clientX;
-      var shiftX;
+      var moveEvtX = moveEvt.clientX;// текущее положение указателя мыши
 
-      var pinPositionInPx = null;
+      var shiftX;// смещение указателя мыши
 
-      // Линия уровня эффекта, на которой расположен ползунок
+      var pinPositionInPx = null;// позиция ползунка в пикселях
+
+      // линия уровня эффекта, на которой расположен ползунок
       var effectLevelLine = document.querySelector('.upload-effect-level-line');
 
       // начальное значение позиции ползунка - начало линии уровня эффекта
@@ -481,51 +496,73 @@
       var pinEndPosition = effectLevelLine.offsetWidth;
 
       // функция нахождения позиции offSetLeft в процентном выражении в
-      // интервале между areaMin и areaMax
+      // интервале между areaMin (pinStartPosition) и areaMax (pinEndPosition)
       var convertToPercent = function (offSetLeft, areaMin, areaMax) {
         return offSetLeft * 100 / (areaMax - areaMin);
       };
 
-      // shiftX !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      // определяю смещение указателя мыши
       if (moveEvtX < areaStart) {
+
+        // ограничиваю смещение, если указатель 'ушел' левее линии
         shiftX = startCoordX - areaStart;
       } else if (moveEvtX > areaEnd) {
+
+        // ограничиваю смещение, если указатель 'ушел' правее линии
         shiftX = startCoordX - areaEnd;
       } else {
+
+        // определяю смещение от начальной позиции минус текущая позиция
         shiftX = startCoordX - moveEvtX;
       }
 
       // позиция pin
       if ((pin.offsetLeft - shiftX) < pinStartPosition) {
+
+        // ограничиваю смещение ползунка влево началом линии
         pinPositionInPx = pinStartPosition;
       } else if ((pin.offsetLeft - shiftX) > pinEndPosition) {
+
+        // ограничиваю смещение ползунка вправо концом линии
         pinPositionInPx = pinEndPosition;
       } else {
+
+        // меняю позицию ползунка
         pinPositionInPx = (pin.offsetLeft - shiftX);
       }
 
       // обновляю первоначальную точку
       if (moveEvtX < areaStart) {
-        startCoordX = pinStartPosition;
+
+        // если левее - то на позиции 0%
+        startCoordX = areaStart;
       } else if (moveEvtX > areaEnd) {
-        startCoordX = pinEndPosition;
+
+        // если правее - то на позиции 100%
+        startCoordX = areaEnd;
       } else {
-        startCoordX -= moveEvtX;
+
+        // обновляю первоначальную точку на текущую позицию от 0% до 100%
+        startCoordX = moveEvtX;
       }
 
       // перевожу значения px в % и задаю это значение в CSS left
       pin.style.left = convertToPercent(pinPositionInPx, pinStartPosition, pinEndPosition) + '%';
+
+      // задаю ширину линии эффекта в соответствии с положением ползунка
+      effectValue.style.width = parseFloat(pin.style.left) + '%';
     };
 
-    // функция: при отпускании клавиши мыши - снимаю обработчики событий:
-    // движение мыши onMouseMove и отпускание мыши onMouseUp
+    // при отпускании кнопки мыши перестаю слушать события движения мыши
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
 
+      // удаляю обработчики событий при отпускании кпонки мыши
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     };
 
+    // при нажатии на кнопку мыши начинаю слушать события движения мыши
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
