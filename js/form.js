@@ -6,6 +6,7 @@
   var COMMENT_MIN_LENGTH = 30;// минимальная длина комментария — 30 символов
   var COMMENT_MAX_LENGTH = 100;// максимальная длина комментария — 100 символов
   var RESIZE_CONTROL_STEP = '25%';// шаг — 25% для формы ввода масштаба
+  var PIN_DEFAULT_POSITION = 20;// позиция ползунка по умолчанию
 
   // ---------- переменные ----------
   // общая форма
@@ -61,7 +62,8 @@
     document.addEventListener('keydown', pressEscToCloseOverlay);
     uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
     submitButton.addEventListener('keydown', onSubmitButtonEnterPress);
-    effectsBlock.addEventListener('click', onFilterClick);// вешаю событие с блока эффектов
+
+    // effectsBlock.addEventListener('click', onFilterClick);// вешаю событие с блока эффектов
     resizeInc.addEventListener('click', onResizeIncClick);// вешаю клик по кнопке "+"
     resizeDec.addEventListener('click', onResizeDecClick);// вешаю клик по кнопке "-"
     // вешаю обработчик клика на кнопку отправки формы
@@ -78,11 +80,11 @@
     // вешаю обработчик очистки формы
     uploadForm.addEventListener('submit', resetForm);
 
-    // перемещаю ползунок в начальное положение при открытии окна
-    pin.style.left = '0%';
+    // перемещаю ползунок в положение по умолчанию при открытии окна
+    pin.style.left = PIN_DEFAULT_POSITION + '%';
 
-    // задаю величине линии эффекта начальное значение 0%
-    effectValue.style.width = '0%';
+    // задаю величине линии эффекта значение по умолчанию
+    effectValue.style.width = PIN_DEFAULT_POSITION + '%';
   };
 
   // функция закрытия uploadOverlay
@@ -93,7 +95,8 @@
     uploadFileInput.addEventListener('change', onUploadFileChange);
     uploadCloseButton.removeEventListener('keydown', pressEnterToCloseOverlay);
     submitButton.removeEventListener('keydown', onSubmitButtonEnterPress);
-    effectsBlock.removeEventListener('click', onFilterClick);// снимаю событие на блок эффектов
+
+    // effectsBlock.removeEventListener('click', onFilterClick);// снимаю событие на блок эффектов
     resizeInc.removeEventListener('click', onResizeIncClick);// снимаю клик по кнопке "+"
     resizeDec.removeEventListener('click', onResizeDecClick);// снимаю клик по кнопке "-"
     // снимаю обработчик клика на кнопку отправки формы
@@ -195,35 +198,91 @@
   // коллекция input форм с эффектами
   var effectInputs = effectsBlock.querySelectorAll('input');
 
-  // ---------- функции ----------
-  // функция 'поимки' клика на блоке эффектов и
-  // применение эффекта к изображению (через делегирование)
-  var onFilterClick = function (evt) {
-    var target = evt.target;
+  // объект эффектов
+  var effects = {
+    'effect-none': null,
+    'effect-chrome': 'grayscale',
+    'effect-sepia': 'sepia',
+    'effect-marvin': 'invert',
+    'effect-phobos': 'blur',
+    'effect-heat': 'brightness',
+  };
 
-    for (var k = 0; k < effectInputs.length; k++) {
-      // название CSS класса - это id фильтра без префикса upload-
-      var filterClassName = effectInputs[k].getAttribute('id');
-      var filterName = filterClassName.substring(PREFIX.length);
+  // блок уровня эффекта
+  var effectLevelBlock = effectsBlock.querySelector('.upload-effect-level');
 
-      // если уже есть фильтр - то убираю его
-      if (previewPicture.classList.contains(filterName)) {
-        previewPicture.classList.remove(filterName);
-      }
+  // прячу блок уровня эффекта (по-умолчанию)
+  effectLevelBlock.classList.add('hidden');
 
-      // поиск события-клика на конкретном фильтре
-      if (target === effectInputs[k]) {
-        // ограничиваю "всплытие" формой с эффектами
-        while (target !== effectsBlock) {
-          previewPicture.classList.add(filterName);
-          break;
-        }
+  // функция: задаю основной картинке CSS фильтр
+  // в зависимости от выбранного эффекта и положения ползунка
+  var setEffect = function (currentEffect, pinPositionInPersent) {
+    // позиция ползунка - избавляюсь от знака '%' в конце
+    var effectLevel = parseFloat(pinPositionInPersent);
 
-        // поднимаюсь выше по DOM-дереву
-        target = target.parentElement;
-      }
+    // в зависимости от эффекта добавляю значение filter в CSS
+    switch (currentEffect) {
+      case 'effect-chrome':
+        previewPicture.style.filter = 'grayscale(' + effectLevel / 100 + ')';
+        break;
+      case 'effect-sepia':
+        previewPicture.style.filter = 'sepia(' + effectLevel / 100 + ')';
+        break;
+      case 'effect-marvin':
+        previewPicture.style.filter = 'invert(' + effectLevel + '%)';
+        break;
+      case 'effect-phobos':
+        previewPicture.style.filter = 'blur(' + (effectLevel * 3 / 100) + 'px)';
+        break;
+      case 'effect-heat':
+        previewPicture.style.filter = 'brightness(' + (effectLevel * 3 / 100) + ')';
+        break;
     }
   };
+
+  // переключателям эффекта добавляю data-атрибут с названием эффекта
+  for (var i = 0; i < effectInputs.length; i++) {
+    var efFilterClassName = effectInputs[i].getAttribute('id');
+    var efFilterName = efFilterClassName.substring(PREFIX.length);
+    effectInputs[i].dataset.effect = efFilterName;
+
+    // по клику добавляю соответствующий эффект основной картинке
+    // @fix при открытии добавить обработчик, при закрытии - убрать
+    // @fix дай функции название и вынеси ее отсюда
+    // пока работает (реши вопрос совместимости параметров и события) - не трожь
+    effectInputs[i].addEventListener('click', function (evt) {
+      var target = evt.target;
+
+      // удаляю все предыдущие эффекты на основной картинке
+      for (var key in effects) {
+        if (previewPicture.classList.contains(key)) {
+          previewPicture.classList.remove(key);
+        }
+      }
+
+      // добавляю эффект по которому был клик (вытягиваю из
+      //  data-атрибута соответсвующего input)
+      previewPicture.classList.add(target.dataset.effect);
+
+      // если фильтр не выбран, то ползунок - скрыт
+      if (previewPicture.classList.contains('effect-none')) {
+        effectLevelBlock.classList.add('hidden');
+      } else {
+        effectLevelBlock.classList.remove('hidden');
+      }
+
+      // обнуляю значение эффекта в CSS (чищу от предыдущих значений)
+      previewPicture.style.filter = null;
+
+      // перемещаю ползунок в начальное положение при открытии окна
+      pin.style.left = PIN_DEFAULT_POSITION + '%';
+
+      // задаю величине линии эффекта начальное значение 0%
+      effectValue.style.width = PIN_DEFAULT_POSITION + '%';
+
+      setEffect(target.dataset.effect, pin.style.left);
+    });
+  }
 
   // ---------- 5 Изменение масштаба изображения ----------
   // ---------- константы ----------
@@ -550,7 +609,20 @@
       pin.style.left = convertToPercent(pinPositionInPx, pinStartPosition, pinEndPosition) + '%';
 
       // задаю ширину линии эффекта в соответствии с положением ползунка
-      effectValue.style.width = parseFloat(pin.style.left) + '%';
+      effectValue.style.width = pin.style.left;
+
+      //
+      // задаю значение фильтра в зависимости от выбранного
+      // эффекта и положения ползунка
+      for (var key in effects) {
+        if (previewPicture.classList.contains(key)) {
+          var activeEffect = key;
+        }
+      }
+
+      // задаю основной картинке эффект
+      // меняю его значение в зависимости от положение ползунка
+      setEffect(activeEffect, pin.style.left);
     };
 
     // при отпускании кнопки мыши перестаю слушать события движения мыши
