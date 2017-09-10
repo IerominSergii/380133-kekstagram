@@ -5,7 +5,6 @@
   // ---------- константы ----------
   var COMMENT_MIN_LENGTH = 30;// минимальная длина комментария — 30 символов
   var COMMENT_MAX_LENGTH = 100;// максимальная длина комментария — 100 символов
-  var RESIZE_CONTROL_STEP = '25%';// шаг — 25% для формы ввода масштаба
   var PIN_DEFAULT_POSITION = 20;// позиция ползунка по умолчанию
 
   // ---------- переменные ----------
@@ -29,9 +28,6 @@
 
   // форма ввода комментария
   var uploadComment = uploadOverlay.querySelector('.upload-form-description');
-
-  // форма ввода масштаба
-  var resizeControl = uploadOverlay.querySelector('.upload-resize-controls-value');
 
   // блок эффектов
   var effectsBlock = uploadOverlay.querySelector('.upload-effect-controls');
@@ -63,9 +59,8 @@
     uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
     submitButton.addEventListener('keydown', onSubmitButtonEnterPress);
 
-    // effectsBlock.addEventListener('click', onFilterClick);// вешаю событие с блока эффектов
-    resizeInc.addEventListener('click', onResizeIncClick);// вешаю клик по кнопке "+"
-    resizeDec.addEventListener('click', onResizeDecClick);// вешаю клик по кнопке "-"
+    // resizeInc.addEventListener('click', onResizeIncClick);// вешаю клик по кнопке "+"
+    // resizeDec.addEventListener('click', onResizeDecClick);// вешаю клик по кнопке "-"
     // вешаю обработчик клика на кнопку отправки формы
     submitButton.addEventListener('click', validateFormCustom);
 
@@ -96,9 +91,9 @@
     uploadCloseButton.removeEventListener('keydown', pressEnterToCloseOverlay);
     submitButton.removeEventListener('keydown', onSubmitButtonEnterPress);
 
-    // effectsBlock.removeEventListener('click', onFilterClick);// снимаю событие на блок эффектов
-    resizeInc.removeEventListener('click', onResizeIncClick);// снимаю клик по кнопке "+"
-    resizeDec.removeEventListener('click', onResizeDecClick);// снимаю клик по кнопке "-"
+    // resizeInc.removeEventListener('click', onResizeIncClick);// снимаю клик по кнопке "+"
+    // resizeDec.removeEventListener('click', onResizeDecClick);// снимаю клик по кнопке "-"
+
     // снимаю обработчик клика на кнопку отправки формы
     submitButton.removeEventListener('click', validateFormCustom);
 
@@ -171,9 +166,6 @@
 
   // максимальная длина комментария — 100 символов
   uploadComment.setAttribute('maxlength', COMMENT_MAX_LENGTH);
-
-  // шаг — 25% для формы ввода масштаба
-  resizeControl.setAttribute('step', RESIZE_CONTROL_STEP);
 
   // ---------- обработчики событий ----------
   // событие - изменение значения поля загрузки фотографии #upload-file
@@ -284,65 +276,15 @@
     });
   }
 
-  // ---------- 5 Изменение масштаба изображения ----------
-  // ---------- константы ----------
-  // минимальное значение масштаба изображения
-  var MIN_IMAGE_SCALE = 25;
+  // Изменение масштаба изображения
+  var scaleElement = document.querySelector('.upload-resize-controls');
 
-  // максимальное значение масштаба изображения
-  var MAX_IMAGE_SCALE = 100;
-
-  // шаг изменения масштаба изображения
-  var RESIZE_STEP = 25;
-
-  // ---------- добавление атрибутов ----------
-  // значение масштаба по умолчанию — 100%
-  resizeControl.setAttribute('value', '100%');
-
-  // ---------- переменные ----------
-  // кнопка увеличения масштаба изображения
-  var resizeInc = document.querySelector('.upload-resize-controls-button-inc');
-
-  // кнопка уменьшения масштаба изображения
-  var resizeDec = document.querySelector('.upload-resize-controls-button-dec');
-
-  // масштаб изображения. parseInt() - для того чтобы отсечь '%'
-  var resizeValue = parseInt(resizeControl.value, 10);
-
-  // ---------- функции ----------
   // изменение масштаба
-  var zoomPicture = function (image, scaleValue) {
-    var scaleRightFormat = ('scale(' + (parseInt(scaleValue, 10) / 100) + ')');
-    image.style.transform = scaleRightFormat;
+  var adjustScale = function (scaleValue) {
+    previewPicture.style.transform = ('scale(' + (parseInt(scaleValue, 10) / 100) + ')');
   };
 
-  // функция увеличения масштаба изображения
-  var onResizeIncClick = function (evt) {
-    evt.preventDefault();
-
-    if ((resizeValue + RESIZE_STEP) <= MAX_IMAGE_SCALE) {
-      resizeValue = resizeValue + RESIZE_STEP;
-    } else {
-      resizeValue = MAX_IMAGE_SCALE;
-    }
-
-    resizeControl.setAttribute('value', resizeValue + '%');
-    zoomPicture(previewPicture, resizeControl.value);
-  };
-
-  // функция уменьшения масштаба изображения
-  var onResizeDecClick = function (evt) {
-    evt.preventDefault();
-
-    if ((resizeValue - RESIZE_STEP) > MIN_IMAGE_SCALE) {
-      resizeValue = resizeValue - RESIZE_STEP;
-    } else {
-      resizeValue = MIN_IMAGE_SCALE;
-    }
-
-    resizeControl.setAttribute('value', resizeValue + '%');
-    zoomPicture(previewPicture, resizeControl.value);
-  };
+  window.initializeScale(scaleElement, adjustScale);
 
   // ---------- 6 Хэш-теги ----------
   // ---------- константы ----------
