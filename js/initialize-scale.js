@@ -19,6 +19,9 @@
   // форма ввода масштаба input
   var resizeControl = uploadOverlay.querySelector('input');
 
+  // значение масштаба по умолчанию — 100%
+  resizeControl.setAttribute('value', '100%');
+
   // масштаб изображения. parseInt() - для того чтобы отсечь '%'
   var resizeValue = parseInt(resizeControl.value, 10);
 
@@ -28,14 +31,9 @@
   // кнопка уменьшения масштаба изображения
   var resizeDec = uploadOverlay.querySelector('.upload-resize-controls-button-dec');
 
-  // ---------- добавление атрибутов ----------
-  // значение масштаба по умолчанию — 100%
-  resizeControl.setAttribute('value', '100%');
-
   // ---------- функции ----------
   // функция увеличения масштаба изображения
   var onResizeIncClick = function (evt) {
-    evt.preventDefault();
 
     if ((resizeValue + RESIZE_STEP) <= MAX_IMAGE_SCALE) {
       resizeValue = resizeValue + RESIZE_STEP;
@@ -46,7 +44,6 @@
 
   // функция уменьшения масштаба изображения
   var onResizeDecClick = function (evt) {
-    evt.preventDefault();
 
     if ((resizeValue - RESIZE_STEP) > MIN_IMAGE_SCALE) {
       resizeValue = resizeValue - RESIZE_STEP;
@@ -55,6 +52,7 @@
     }
   };
 
+  // глобальная функция
   window.initializeScale = function (element, changeScale) {
     element.addEventListener('click', function (evt) {
 
