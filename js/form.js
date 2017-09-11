@@ -37,6 +37,9 @@
   // линия эффекта картинки
   var effectValue = effectsBlock.querySelector('.upload-effect-level-val');
 
+  // основная картинка в форме загрузки .upload-form-preview
+  var previewPicture = document.querySelector('.effect-image-preview');
+
   // ---------- функции ----------
   // функция закрытия uploadImage
   var closeUploadImage = function () {
@@ -75,10 +78,10 @@
     uploadForm.addEventListener('submit', resetForm);
 
     // перемещаю ползунок в положение по умолчанию при открытии окна
-    pin.style.left = PIN_DEFAULT_POSITION + '%';
+    pin.style.left = window.initializeFilters.PIN_DEFAULT_POSITION + '%';
 
     // задаю величине линии эффекта значение по умолчанию
-    effectValue.style.width = PIN_DEFAULT_POSITION + '%';
+    effectValue.style.width = window.initializeFilters.PIN_DEFAULT_POSITION + '%';
   };
 
   // функция закрытия uploadOverlay
@@ -185,7 +188,7 @@
   // NB! Параметры newFilter и oldFilter введены для того,
   // чтобы отменить предыдущий выбранный фильтр. В вашем
   // решении, может использоваться другой подход.
-  var applyEffect = function (effectsBlock, addEffect) {
+  var applyEffect = function (filtersBlock, addEffect) {
     // коллекция input форм с эффектами
     var effectInputs = filtersBlock.querySelectorAll('input');
 
@@ -197,6 +200,7 @@
 
       // по клику добавляю соответствующий эффект основной картинке
       effectInputs[i].addEventListener('click', addEffect);
+    }
   };
 
   window.initializeFilters(effectsBlock, applyEffect);
@@ -481,7 +485,7 @@
       //
       // задаю значение фильтра в зависимости от выбранного
       // эффекта и положения ползунка
-      for (var key in effects) {
+      for (var key in window.initializeFilters.effects) {
         if (previewPicture.classList.contains(key)) {
           var activeEffect = key;
         }

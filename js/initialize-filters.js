@@ -4,7 +4,7 @@
 (function () {
   // ---------- 4 Применение эффекта к изображению ----------
 
-  var PIN_DEFAULT_POSITION = 20;// позиция ползунка по умолчанию
+  window.initializeFilters.PIN_DEFAULT_POSITION = 20;// позиция ползунка по умолчанию
   // ---------- переменные ----------
   // основная картинка в форме загрузки .upload-form-preview
   var previewPicture = document.querySelector('.effect-image-preview');
@@ -25,7 +25,7 @@
   effectLevelBlock.classList.add('hidden');
 
   // объект эффектов
-  var effects = {
+  window.initializeFilters.effects = {
     'effect-none': null,
     'effect-chrome': 'grayscale',
     'effect-sepia': 'sepia',
@@ -64,7 +64,7 @@
     var target = evt.target;
 
     // удаляю все предыдущие эффекты на основной картинке
-    for (var key in effects) {
+    for (var key in window.initializeFilters.effects) {
       if (previewPicture.classList.contains(key)) {
         previewPicture.classList.remove(key);
       }
@@ -85,10 +85,10 @@
     previewPicture.style.filter = null;
 
     // перемещаю ползунок в начальное положение при открытии окна
-    pin.style.left = PIN_DEFAULT_POSITION + '%';
+    pin.style.left = window.initializeFilters.PIN_DEFAULT_POSITION + '%';
 
     // задаю величине линии эффекта начальное значение 0%
-    effectValue.style.width = PIN_DEFAULT_POSITION + '%';
+    effectValue.style.width = window.initializeFilters.PIN_DEFAULT_POSITION + '%';
 
     window.initializeFilters.setEffect(target.dataset.effect, pin.style.left);
   };
