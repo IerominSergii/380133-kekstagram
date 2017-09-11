@@ -2,145 +2,98 @@
 'use strict';
 
 (function () {
-  // название CSS класса - это название фильтра без префикса 'upload-'
-  var PREFIX = 'upload-';
+  // ---------- 4 Применение эффекта к изображению ----------
 
-  window.initializeFilters = function (effectElement, doFilter) {
-    // переключателям эффекта добавляю data-атрибут с названием эффекта
-    // и вешаю обработчик события на клик на каждый input в блоке
-    var effectInputs = effectElement.querySelectorAll('input');
-    for (var i = 0; i < effectInputs.length; i++) {
-      var efFilterClassName = effectInputs[i].getAttribute('id');
-      var efFilterName = efFilterClassName.substring(PREFIX.length);
-      effectInputs[i].dataset.effect = efFilterName;
+  var PIN_DEFAULT_POSITION = 20;// позиция ползунка по умолчанию
+  // ---------- переменные ----------
+  // основная картинка в форме загрузки .upload-form-preview
+  var previewPicture = document.querySelector('.effect-image-preview');
 
-      effectInputs[i].addEventListener('click', doFilter);
+  // блок эффектов
+  var effectsBlock = document.querySelector('.upload-effect-controls');
+
+  // блок уровня эффекта
+  var effectLevelBlock = effectsBlock.querySelector('.upload-effect-level');
+
+  // ползунок изменения эффекта картинки
+  var pin = effectsBlock.querySelector('.upload-effect-level-pin');
+
+  // линия эффекта картинки
+  var effectValue = effectsBlock.querySelector('.upload-effect-level-val');
+
+  // прячу блок уровня эффекта (по-умолчанию)
+  effectLevelBlock.classList.add('hidden');
+
+  // объект эффектов
+  var effects = {
+    'effect-none': null,
+    'effect-chrome': 'grayscale',
+    'effect-sepia': 'sepia',
+    'effect-marvin': 'invert',
+    'effect-phobos': 'blur',
+    'effect-heat': 'brightness',
+  };
+
+  // функция: задаю основной картинке CSS фильтр
+  // в зависимости от выбранного эффекта и положения ползунка
+  window.initializeFilters.setEffect = function (currentEffect, pinPositionInPersent) {
+    // позиция ползунка - избавляюсь от знака '%' в конце
+    var effectLevel = parseFloat(pinPositionInPersent);
+
+    // в зависимости от эффекта добавляю значение filter в CSS
+    switch (currentEffect) {
+      case 'effect-chrome':
+        previewPicture.style.filter = 'grayscale(' + effectLevel / 100 + ')';
+        break;
+      case 'effect-sepia':
+        previewPicture.style.filter = 'sepia(' + effectLevel / 100 + ')';
+        break;
+      case 'effect-marvin':
+        previewPicture.style.filter = 'invert(' + effectLevel + '%)';
+        break;
+      case 'effect-phobos':
+        previewPicture.style.filter = 'blur(' + (effectLevel * 3 / 100) + 'px)';
+        break;
+      case 'effect-heat':
+        previewPicture.style.filter = 'brightness(' + (effectLevel * 3 / 100) + ')';
+        break;
+    }
+  };
+
+  var onEffectInputClick = function (evt) {
+    var target = evt.target;
+
+    // удаляю все предыдущие эффекты на основной картинке
+    for (var key in effects) {
+      if (previewPicture.classList.contains(key)) {
+        previewPicture.classList.remove(key);
+      }
     }
 
-    // ---------- pin move ----------
-    // функция нахождения позиции pin.style.left в пиксельном выражении в
-    // интервале между areaMin (pinStartPosition) и areaMax (pinEndPosition)
-    var convertToPx = function (pinStyleLeft, areaMin, areaMax) {
-      return (parseInt(pinStyleLeft, 10) * (areaMax - areaMin)) / 100;
-    };
+    // добавляю эффект по которому был клик (вытягиваю из
+    //  data-атрибута соответсвующего input)
+    previewPicture.classList.add(target.dataset.effect);
 
-    // обработчик нажатия кнопки мыши на ползунке
-    pin.addEventListener('mousedown', function (evt) {
-      evt.preventDefault();
+    // если фильтр не выбран, то ползунок - скрыт
+    if (previewPicture.classList.contains('effect-none')) {
+      effectLevelBlock.classList.add('hidden');
+    } else {
+      effectLevelBlock.classList.remove('hidden');
+    }
 
-      // запоминаю координату X точки, с которой начинаю перемещение ползунка
-      var startCoordX = evt.clientX;
+    // обнуляю значение эффекта в CSS (чищу от предыдущих значений)
+    previewPicture.style.filter = null;
 
-      var areaStart = startCoordX;// начало линии уровня эффекта
+    // перемещаю ползунок в начальное положение при открытии окна
+    pin.style.left = PIN_DEFAULT_POSITION + '%';
 
-      // если ползунок находится не на начальной позиции,
-      // то от areaStart отнимаю положение ползунка в 'px'
-      if (parseInt(pin.style.left, 10)) {
-        areaStart = startCoordX - convertToPx(pin.style.left, 0, 456);
-      }
+    // задаю величине линии эффекта начальное значение 0%
+    effectValue.style.width = PIN_DEFAULT_POSITION + '%';
 
-      var areaEnd = areaStart + 456;// конец линии уровня эффекта
+    window.initializeFilters.setEffect(target.dataset.effect, pin.style.left);
+  };
 
-      // при движении мыши:
-      // - обновляю смещение относительно первоначальной точки
-      // - меняю положение ползунка и линии уровня эффекта
-      var onMouseMove = function (moveEvt) {
-        moveEvt.preventDefault();
-
-        var moveEvtX = moveEvt.clientX;// текущее положение указателя мыши
-
-        var shiftX;// смещение указателя мыши
-
-        var pinPositionInPx = null;// позиция ползунка в пикселях
-
-        // начальное значение позиции ползунка - начало линии уровня эффекта
-        var pinStartPosition = effectLevelLine.clientLeft;
-
-        // конечное значение позиции ползунка - конец линии уровня эффекта
-        var pinEndPosition = effectLevelLine.offsetWidth;
-
-        // функция нахождения позиции offSetLeft в процентном выражении в
-        // интервале между areaMin (pinStartPosition) и areaMax (pinEndPosition)
-        var convertToPercent = function (offSetLeft, areaMin, areaMax) {
-          return offSetLeft * 100 / (areaMax - areaMin);
-        };
-
-        // определяю смещение указателя мыши
-        if (moveEvtX < areaStart) {
-
-          // ограничиваю смещение, если указатель 'ушел' левее линии
-          shiftX = startCoordX - areaStart;
-        } else if (moveEvtX > areaEnd) {
-
-          // ограничиваю смещение, если указатель 'ушел' правее линии
-          shiftX = startCoordX - areaEnd;
-        } else {
-
-          // определяю смещение от начальной позиции минус текущая позиция
-          shiftX = startCoordX - moveEvtX;
-        }
-
-        // позиция pin
-        if ((pin.offsetLeft - shiftX) < pinStartPosition) {
-
-          // ограничиваю смещение ползунка влево началом линии
-          pinPositionInPx = pinStartPosition;
-        } else if ((pin.offsetLeft - shiftX) > pinEndPosition) {
-
-          // ограничиваю смещение ползунка вправо концом линии
-          pinPositionInPx = pinEndPosition;
-        } else {
-
-          // меняю позицию ползунка
-          pinPositionInPx = (pin.offsetLeft - shiftX);
-        }
-
-        // обновляю первоначальную точку
-        if (moveEvtX < areaStart) {
-
-          // если левее - то на позиции 0%
-          startCoordX = areaStart;
-        } else if (moveEvtX > areaEnd) {
-
-          // если правее - то на позиции 100%
-          startCoordX = areaEnd;
-        } else {
-
-          // обновляю первоначальную точку на текущую позицию от 0% до 100%
-          startCoordX = moveEvtX;
-        }
-
-        // перевожу значения px в % и задаю это значение в CSS left
-        pin.style.left = convertToPercent(pinPositionInPx, pinStartPosition, pinEndPosition) + '%';
-
-        // задаю ширину линии эффекта в соответствии с положением ползунка
-        effectValue.style.width = pin.style.left;
-
-        // задаю значение фильтра в зависимости от выбранного
-        // эффекта и положения ползунка
-        for (var key in effects) {
-          if (previewPicture.classList.contains(key)) {
-            var activeEffect = key;
-          }
-        }
-
-        // задаю основной картинке эффект
-        // меняю его значение в зависимости от положение ползунка
-        setEffect(activeEffect, pin.style.left);
-      };
-
-      // при отпускании кнопки мыши перестаю слушать события движения мыши
-      var onMouseUp = function (upEvt) {
-        upEvt.preventDefault();
-
-        // удаляю обработчики событий при отпускании кпонки мыши
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-      };
-
-      // при нажатии на кнопку мыши начинаю слушать события движения мыши
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    });
+  window.initializeFilters = function (filtersBlock, applyFilter) {
+    applyFilter(filtersBlock, onEffectInputClick);
   };
 })();
