@@ -77,11 +77,7 @@
     // вешаю обработчик очистки формы
     uploadForm.addEventListener('submit', resetForm);
 
-    // перемещаю ползунок в положение по умолчанию при открытии окна
-    pin.style.left = window.initializeFilters.PIN_DEFAULT_POSITION + '%';
-
-    // задаю величине линии эффекта значение по умолчанию
-    effectValue.style.width = window.initializeFilters.PIN_DEFAULT_POSITION + '%';
+    window.setPinDefaultPos(previewPicture, pin, effectValue);
   };
 
   // функция закрытия uploadOverlay
@@ -485,7 +481,7 @@
       //
       // задаю значение фильтра в зависимости от выбранного
       // эффекта и положения ползунка
-      for (var key in window.initializeFilters.effects) {
+      for (var key in window.effects) {
         if (previewPicture.classList.contains(key)) {
           var activeEffect = key;
         }
@@ -493,7 +489,7 @@
 
       // задаю основной картинке эффект
       // меняю его значение в зависимости от положение ползунка
-      window.initializeFilters.setEffect(activeEffect, pin.style.left);
+      window.setEffect(activeEffect, pin.style.left);
     };
 
     // при отпускании кнопки мыши перестаю слушать события движения мыши

@@ -3,8 +3,20 @@
 
 (function () {
   // ---------- 4 Применение эффекта к изображению ----------
+  var PIN_DEFAULT_POSITION = 20;// позиция ползунка по умолчанию
 
-  window.initializeFilters.PIN_DEFAULT_POSITION = 20;// позиция ползунка по умолчанию
+  // функция броса эффекта на значения по умолчанию
+  window.setPinDefaultPos = function (picture, pinElement, filterValue) {
+    // обнуляю значение эффекта в CSS (чищу от предыдущих значений)
+    picture.style.filter = null;
+
+    // перемещаю ползунок в начальное положение при открытии окна
+    pinElement.style.left = PIN_DEFAULT_POSITION + '%';
+
+    // задаю величине линии эффекта начальное значение 0%
+    filterValue.style.width = PIN_DEFAULT_POSITION + '%';
+  };
+
   // ---------- переменные ----------
   // основная картинка в форме загрузки .upload-form-preview
   var previewPicture = document.querySelector('.effect-image-preview');
@@ -25,7 +37,7 @@
   effectLevelBlock.classList.add('hidden');
 
   // объект эффектов
-  window.initializeFilters.effects = {
+  window.effects = {
     'effect-none': null,
     'effect-chrome': 'grayscale',
     'effect-sepia': 'sepia',
@@ -36,7 +48,7 @@
 
   // функция: задаю основной картинке CSS фильтр
   // в зависимости от выбранного эффекта и положения ползунка
-  window.initializeFilters.setEffect = function (currentEffect, pinPositionInPersent) {
+  window.setEffect = function (currentEffect, pinPositionInPersent) {
     // позиция ползунка - избавляюсь от знака '%' в конце
     var effectLevel = parseFloat(pinPositionInPersent);
 
@@ -64,7 +76,7 @@
     var target = evt.target;
 
     // удаляю все предыдущие эффекты на основной картинке
-    for (var key in window.initializeFilters.effects) {
+    for (var key in window.effects) {
       if (previewPicture.classList.contains(key)) {
         previewPicture.classList.remove(key);
       }
@@ -81,16 +93,9 @@
       effectLevelBlock.classList.remove('hidden');
     }
 
-    // обнуляю значение эффекта в CSS (чищу от предыдущих значений)
-    previewPicture.style.filter = null;
+    window.setPinDefaultPos(previewPicture, pin, effectValue);
 
-    // перемещаю ползунок в начальное положение при открытии окна
-    pin.style.left = window.initializeFilters.PIN_DEFAULT_POSITION + '%';
-
-    // задаю величине линии эффекта начальное значение 0%
-    effectValue.style.width = window.initializeFilters.PIN_DEFAULT_POSITION + '%';
-
-    window.initializeFilters.setEffect(target.dataset.effect, pin.style.left);
+    window.setEffect(target.dataset.effect, pin.style.left);
   };
 
   window.initializeFilters = function (filtersBlock, applyFilter) {
