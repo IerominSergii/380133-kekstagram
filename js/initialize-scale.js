@@ -53,8 +53,8 @@
   };
 
   // глобальная функция
-  window.initializeScale = function (element, changeScale) {
-    element.addEventListener('click', function (evt) {
+  window.initializeScale = function (controlElement, changeScale) {
+    controlElement.addEventListener('click', function (evt) {
 
       // добавляю шаг — RESIZE_STEP для формы ввода масштаба
       resizeControl.setAttribute('step', (RESIZE_STEP + '%'));
