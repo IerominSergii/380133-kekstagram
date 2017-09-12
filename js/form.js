@@ -4,7 +4,7 @@
 (function () {
   // ---------- константы ----------
   var COMMENT_MIN_LENGTH = 30;// минимальная длина комментария — 30 символов
-  var COMMENT_MAX_LENGTH = 100;// максимальная длина комментария — 100 символов
+  var COMMENT_MAX_LENGTH = 140;// максимальная длина комментария — 140 символов
 
   // ---------- переменные ----------
   // общая форма
@@ -176,27 +176,18 @@
   // если фокус на крестике .upload-form-cancel
   uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
 
-  // ---------- initialize-filters.js ----------
-  // ---------- константа ----------
-  // название CSS класса - это название фильтра без префикса 'upload-'
-  var PREFIX = 'upload-';
-
-  // NB! Параметры newFilter и oldFilter введены для того,
-  // чтобы отменить предыдущий выбранный фильтр. В вашем
-  // решении, может использоваться другой подход.
-  var applyEffect = function (filtersBlock, addEffect) {
-    // коллекция input форм с эффектами
-    var effectInputs = filtersBlock.querySelectorAll('input');
-
-    // переключателям эффекта добавляю data-атрибут с названием эффекта
-    for (var i = 0; i < effectInputs.length; i++) {
-      var efFilterClassName = effectInputs[i].getAttribute('id');
-      var efFilterName = efFilterClassName.substring(PREFIX.length);
-      effectInputs[i].dataset.effect = efFilterName;
-
-      // по клику добавляю соответствующий эффект основной картинке
-      effectInputs[i].addEventListener('click', addEffect);
+  // ---------- initializeFilters----------
+  var applyEffect = function (newFilter) {
+    // удаляю все предыдущие эффекты на основной картинке
+    for (var key in window.effects) {
+      if (previewPicture.classList.contains(key)) {
+        previewPicture.classList.remove(key);
+      }
     }
+
+    // добавляю эффект по которому был клик (вытягиваю из
+    //  data-атрибута соответсвующего input)
+    previewPicture.classList.add(newFilter);
   };
 
   window.initializeFilters(effectsBlock, applyEffect);

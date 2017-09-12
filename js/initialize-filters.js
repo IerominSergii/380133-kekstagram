@@ -3,6 +3,9 @@
 
 (function () {
   // ---------- 4 Применение эффекта к изображению ----------
+  // ---------- константа ----------
+  // название CSS класса - это название фильтра без префикса 'upload-'
+  var PREFIX = 'upload-';
   var PIN_DEFAULT_POSITION = 20;// позиция ползунка по умолчанию
 
   // функция броса эффекта на значения по умолчанию
@@ -72,33 +75,35 @@
     }
   };
 
-  var onEffectInputClick = function (evt) {
-    var target = evt.target;
-
-    // удаляю все предыдущие эффекты на основной картинке
-    for (var key in window.effects) {
-      if (previewPicture.classList.contains(key)) {
-        previewPicture.classList.remove(key);
-      }
-    }
-
-    // добавляю эффект по которому был клик (вытягиваю из
-    //  data-атрибута соответсвующего input)
-    previewPicture.classList.add(target.dataset.effect);
-
-    // если фильтр не выбран, то ползунок - скрыт
-    if (previewPicture.classList.contains('effect-none')) {
-      effectLevelBlock.classList.add('hidden');
-    } else {
-      effectLevelBlock.classList.remove('hidden');
-    }
-
-    window.setPinDefaultPos(previewPicture, pin, effectValue);
-
-    window.setEffect(target.dataset.effect, pin.style.left);
-  };
-
   window.initializeFilters = function (filtersBlock, applyFilter) {
-    applyFilter(filtersBlock, onEffectInputClick);
+    var onEffectInputClick = function (evt) {
+      var target = evt.target;
+
+      // если фильтр не выбран, то ползунок - скрыт
+      if (previewPicture.classList.contains('effect-none')) {
+        effectLevelBlock.classList.add('hidden');
+      } else {
+        effectLevelBlock.classList.remove('hidden');
+      }
+
+      window.setPinDefaultPos(previewPicture, pin, effectValue);
+
+      window.setEffect(target.dataset.effect, pin.style.left);
+
+      applyFilter(target.dataset.effect);
+    };
+
+    // коллекция input форм с эффектами
+    var effectInputs = filtersBlock.querySelectorAll('input');
+
+    // переключателям эффекта добавляю data-атрибут с названием эффекта
+    for (var i = 0; i < effectInputs.length; i++) {
+      var efFilterClassName = effectInputs[i].getAttribute('id');
+      var efFilterName = efFilterClassName.substring(PREFIX.length);
+      effectInputs[i].dataset.effect = efFilterName;
+
+      // по клику добавляю соответствующий эффект основной картинке
+      effectInputs[i].addEventListener('click', onEffectInputClick);
+    }
   };
 })();
