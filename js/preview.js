@@ -22,13 +22,29 @@
     // 'достаю' data- индекс из элемента
     var index = pict.dataset.index;
 
-    // по data- индексу передаю соответствующий элемент из массива в эту функцию
-    var shot = window.picture.pictures[index];
+    var onLoadSuccesSetPictureToGallery = function (images) {
+      // отрисовываю превью
+      galleryElement.querySelector('.gallery-overlay-image').setAttribute('src', images[index].url);
+      galleryElement.querySelector('.likes-count').textContent = images[index].likes;
+      galleryElement.querySelector('.comments-count').textContent = images[index].comments.length;
+    };
 
-    // отрисовываю превью
-    galleryElement.querySelector('.gallery-overlay-image').setAttribute('src', shot.url);
-    galleryElement.querySelector('.likes-count').textContent = shot.likes;
-    galleryElement.querySelector('.comments-count').textContent = shot.commentsCount;
+    var onLoadErrorShowMessage = function (errorMessage) {
+      var node = document.createElement('div');
+      node.style['z-index'] = 100;
+      node.style.margin = '0 auto';
+      node.style['text-align'] = 'center';
+      node.style['background-color'] = 'red';
+      node.style.position = 'absolute';
+      node.style.left = 0;
+      node.style.right = 0;
+      node.style.fontSize = '30px';
+
+      node.textContent = errorMessage;
+      document.body.insertAdjacentElement('afterbegin', node);
+    };
+
+    window.backend.load(onLoadSuccesSetPictureToGallery, onLoadErrorShowMessage);
   };
 
   // функция открытия превью

@@ -7,11 +7,11 @@
   var setup = function (onLoad, onError) {
     var xhr = new XMLHttpRequest();
 
-    xhr.responseType = 'json';
+    xhr.responseType = 'text';
 
     xhr.addEventListener('load', function () {
       try {
-        onLoad(xhr.responseText);
+        onLoad(JSON.parse(xhr.responseText));
       } catch (err) {
         onError(err.message);
       }
