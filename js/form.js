@@ -176,7 +176,7 @@
   // если фокус на крестике .upload-form-cancel
   uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
 
-  // ---------- initializeFilters----------
+  // ---------- изменения фильтра ----------
   var applyEffect = function (newFilter) {
     // удаляю все предыдущие эффекты на основной картинке
     for (var key in window.effects) {
