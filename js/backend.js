@@ -64,22 +64,22 @@
 
     // сообщение об ошибках
     onLoadError: function (errorMessage) {
-      var node = document.createElement('div');
-      node.style['z-index'] = 100;
-      node.style.padding = '60px';
-      node.style.margin = '0 auto';
-      node.style['text-align'] = 'center';
-      node.style['background-color'] = 'rgba( 0, 0, 0, 0.8)';
-      node.style.position = 'fixed';
-      node.style.left = 0;
-      node.style.right = 0;
-      node.style.fontSize = '20px';
-      node.style.color = 'tomato';
-      node.style['font-family'] = '/"Open Sans/", Arial, sans-serif;';
-      node.style['border-radius'] = '4px';
+      var errorPopup = document.createElement('div');
+      errorPopup.style['z-index'] = 100;
+      errorPopup.style.padding = '60px';
+      errorPopup.style.margin = '0 auto';
+      errorPopup.style['text-align'] = 'center';
+      errorPopup.style['background-color'] = 'rgba( 0, 0, 0, 0.8)';
+      errorPopup.style.position = 'fixed';
+      errorPopup.style.left = 0;
+      errorPopup.style.right = 0;
+      errorPopup.style.fontSize = '20px';
+      errorPopup.style.color = 'tomato';
+      errorPopup.style['font-family'] = '/"Open Sans/", Arial, sans-serif;';
+      errorPopup.style['border-radius'] = '4px';
 
-      node.textContent = errorMessage;
-      document.body.insertAdjacentElement('afterbegin', node);
+      errorPopup.textContent = errorMessage;
+      document.body.insertAdjacentElement('afterbegin', errorPopup);
     },
   };
 })();
