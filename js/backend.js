@@ -38,6 +38,37 @@
     return xhr;
   };
 
+  // CSS свойства окна ошибки
+  var notificationWindowStyles = {
+    zIndex: 100,
+    padding: '60px',
+    margin: '0 auto',
+    textAlign: 'center',
+    backgroundColor: 'rgba( 0, 0, 0, 0.8)',
+    position: 'fixed',
+    left: 0,
+    right: 0,
+    fontSize: '20px',
+    color: 'tomato',
+    fontFamily: '/"Open Sans/", Arial, sans-serif;',
+    borderRadius: '4px',
+  };
+
+  // создание окна ошибки
+  var createNotification = function (innerText) {
+    var notificationWindow = document.createElement('div');
+    for (var key in notificationWindowStyles) {
+      if (notificationWindowStyles.hasOwnProperty(key)) {
+        notificationWindow.style[key] = notificationWindowStyles[key];
+      }
+    }
+
+    // innerText - текст сообщения (например, текст ошибки)
+    notificationWindow.textContent = innerText;
+
+    return notificationWindow;
+  };
+
   window.backend = {
     // получение данных с сервера с методом POST на адрес SERVER_URL
     // функция onLoad, если данные отправлены успешно
@@ -62,24 +93,11 @@
       xhr.send(data);
     },
 
-    // сообщение об ошибках
-    onLoadError: function (errorMessage) {
-      var errorPopup = document.createElement('div');
-      errorPopup.style['z-index'] = 100;
-      errorPopup.style.padding = '60px';
-      errorPopup.style.margin = '0 auto';
-      errorPopup.style['text-align'] = 'center';
-      errorPopup.style['background-color'] = 'rgba( 0, 0, 0, 0.8)';
-      errorPopup.style.position = 'fixed';
-      errorPopup.style.left = 0;
-      errorPopup.style.right = 0;
-      errorPopup.style.fontSize = '20px';
-      errorPopup.style.color = 'tomato';
-      errorPopup.style['font-family'] = '/"Open Sans/", Arial, sans-serif;';
-      errorPopup.style['border-radius'] = '4px';
-
-      errorPopup.textContent = errorMessage;
-      document.body.insertAdjacentElement('afterbegin', errorPopup);
+    // передаю текст ошибки в функцию создания окна об ошибках
+    // добавляю окно об ошибках в DOM дерево
+    onLoadError: function (errorText) {
+      var errorMessage = createNotification(errorText);
+      document.body.insertAdjacentElement('afterbegin', errorMessage);
     },
   };
 })();
