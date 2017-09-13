@@ -2,6 +2,11 @@
 'use strict';
 
 (function () {
+  // ---------- константы ----------
+  // кнопки клавиатуры
+  var ESC_KEYCODE = 27;
+  var ENTER_KEYCODE = 13;
+
   // ---------- DOM элементы ----------
   // превью
   var galleryElement = document.querySelector('.gallery-overlay');
@@ -27,6 +32,9 @@
       galleryElement.querySelector('.gallery-overlay-image').setAttribute('src', images[index].url);
       galleryElement.querySelector('.likes-count').textContent = images[index].likes;
       galleryElement.querySelector('.comments-count').textContent = images[index].comments.length;
+
+      // открываю превью
+      galleryOpen();
     };
 
     window.backend.load(onLoadSuccesSetPictureToGallery, window.backend.onLoadError);
@@ -82,7 +90,7 @@
   var onCrossEnterPressGalleryClose = function (evt) {
     var keyCode = evt.keyCode;
     var targetClick = evt.target;
-    var enterButton = window.data.ENTER_KEYCODE;
+    var enterButton = ENTER_KEYCODE;
 
     if (keyCode === enterButton && targetClick.classList.contains('gallery-overlay-close')) {
       evt.preventDefault();
@@ -93,7 +101,7 @@
   // функция закрытия превью по нажатию ESC
   var onEscPressGalleryClose = function (evt) {
     var keyCode = evt.keyCode;
-    if (keyCode === window.data.ESC_KEYCODE) {
+    if (keyCode === ESC_KEYCODE) {
       galleryClose();
     }
   };
@@ -111,9 +119,6 @@
 
         // добавляю картинку (по которой был клик) в превью
         setPictureToGallery(targetClick);
-
-        // открываю превью
-        galleryOpen();
         break;
       }
 
@@ -127,7 +132,7 @@
   var onPictureEnterPressGalleryOpen = function (evt) {
     var keyCode = evt.keyCode;
     var targetClick = evt.target;
-    if (keyCode === window.data.ENTER_KEYCODE && targetClick.classList.contains('picture')) {
+    if (keyCode === ENTER_KEYCODE && targetClick.classList.contains('picture')) {
       evt.preventDefault();
       setPictureToGallery(targetClick);
       galleryOpen();

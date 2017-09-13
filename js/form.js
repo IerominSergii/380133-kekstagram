@@ -3,6 +3,11 @@
 
 (function () {
   // ---------- константы ----------
+  // кнопки клавиатуры
+  var ESC_KEYCODE = 27;
+  var ENTER_KEYCODE = 13;
+
+  // ---------- константы ----------
   var COMMENT_MIN_LENGTH = 30;// минимальная длина комментария — 30 символов
   var COMMENT_MAX_LENGTH = 140;// максимальная длина комментария — 140 символов
 
@@ -72,9 +77,6 @@
     // если комменты валидны
     submitButton.addEventListener('click', becameValidAfterSubmitClick);
 
-    // вешаю обработчик очистки формы
-    // uploadForm.addEventListener('submit', resetForm);
-
     window.setPinDefaultPos(previewPicture, pin, effectValue);
   };
 
@@ -97,9 +99,6 @@
     // снимаю обработчик - убрать красную рамку по нажатию на кнопку Отправить
     // если комменты валидны
     submitButton.removeEventListener('click', becameValidAfterSubmitClick);
-
-    // снимаю обработчик очистки формы
-    // uploadForm.removeEventListener('submit', resetForm);
   };
 
   // функция по изменению значния поля загрузки фото
@@ -117,7 +116,7 @@
 
   // закрытие формы кадрирования uploadOverlay по нажатию ESC
   var pressEscToCloseOverlay = function (evt) {
-    if (evt.keyCode === window.data.ESC_KEYCODE && evt.target !== uploadComment) {
+    if (evt.keyCode === ESC_KEYCODE && evt.target !== uploadComment) {
       // нажата клавиша ESC?
       // если фокус находится на форме ввода комментария, то форма не закрывается
       evt.preventDefault();
@@ -129,7 +128,7 @@
   // функция закрытия формы кадрирования uploadOverlay по нажатию ENTER
   var pressEnterToCloseOverlay = function (evt) {
     evt.preventDefault();
-    if (evt.keyCode === window.data.ENTER_KEYCODE) {
+    if (evt.keyCode === ENTER_KEYCODE) {
       closeUploadOverlay();
     }
   };
@@ -139,7 +138,7 @@
 
   // функция генерации клика на нажатию ENTER на кнопке Отправить
   var onSubmitButtonEnterPress = function (evt) {
-    if (evt.keyCode === window.data.ENTER_KEYCODE) {
+    if (evt.keyCode === ENTER_KEYCODE) {
       submitButton.dispatchEvent(doClick);
     }
   };
@@ -313,13 +312,6 @@
       hideInvalid(uploadComment);
     }
   };
-
-  // функция очистки формы после сабмита
-  // var resetForm = function () {
-  //   if (uploadForm.validity.valid) {
-  //     uploadForm.reset();
-  //   }
-  // };
 
   // функция валидации формы (хэш-тегов) - нестандартный валидации
   var validateFormCustom = function () {

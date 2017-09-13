@@ -79,18 +79,18 @@
     var onEffectInputClick = function (evt) {
       var target = evt.target;
 
+      window.setPinDefaultPos(previewPicture, pin, effectValue);
+
+      window.setEffect(target.dataset.effect, pin.style.left);
+
+      applyFilter(target.dataset.effect);
+
       // если фильтр не выбран, то ползунок - скрыт
       if (previewPicture.classList.contains('effect-none')) {
         effectLevelBlock.classList.add('hidden');
       } else {
         effectLevelBlock.classList.remove('hidden');
       }
-
-      window.setPinDefaultPos(previewPicture, pin, effectValue);
-
-      window.setEffect(target.dataset.effect, pin.style.left);
-
-      applyFilter(target.dataset.effect);
     };
 
     // коллекция input форм с эффектами
