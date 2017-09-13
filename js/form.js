@@ -61,8 +61,6 @@
     uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
     submitButton.addEventListener('keydown', onSubmitButtonEnterPress);
 
-    // resizeInc.addEventListener('click', onResizeIncClick);// вешаю клик по кнопке "+"
-    // resizeDec.addEventListener('click', onResizeDecClick);// вешаю клик по кнопке "-"
     // вешаю обработчик клика на кнопку отправки формы
     submitButton.addEventListener('click', validateFormCustom);
 
@@ -75,7 +73,7 @@
     submitButton.addEventListener('click', becameValidAfterSubmitClick);
 
     // вешаю обработчик очистки формы
-    uploadForm.addEventListener('submit', resetForm);
+    // uploadForm.addEventListener('submit', resetForm);
 
     window.setPinDefaultPos(previewPicture, pin, effectValue);
   };
@@ -89,9 +87,6 @@
     uploadCloseButton.removeEventListener('keydown', pressEnterToCloseOverlay);
     submitButton.removeEventListener('keydown', onSubmitButtonEnterPress);
 
-    // resizeInc.removeEventListener('click', onResizeIncClick);// снимаю клик по кнопке "+"
-    // resizeDec.removeEventListener('click', onResizeDecClick);// снимаю клик по кнопке "-"
-
     // снимаю обработчик клика на кнопку отправки формы
     submitButton.removeEventListener('click', validateFormCustom);
 
@@ -104,7 +99,7 @@
     submitButton.removeEventListener('click', becameValidAfterSubmitClick);
 
     // снимаю обработчик очистки формы
-    uploadForm.removeEventListener('submit', resetForm);
+    // uploadForm.removeEventListener('submit', resetForm);
   };
 
   // функция по изменению значния поля загрузки фото
@@ -320,11 +315,11 @@
   };
 
   // функция очистки формы после сабмита
-  var resetForm = function () {
-    if (uploadForm.validity.valid) {
-      uploadForm.reset();
-    }
-  };
+  // var resetForm = function () {
+  //   if (uploadForm.validity.valid) {
+  //     uploadForm.reset();
+  //   }
+  // };
 
   // функция валидации формы (хэш-тегов) - нестандартный валидации
   var validateFormCustom = function () {
@@ -366,6 +361,34 @@
   uploadForm.setAttribute('action', 'https://1510.dump.academy/kekstagram');
   uploadForm.setAttribute('method', 'post');
   uploadForm.setAttribute('enctype', 'multipart/form-data');
+
+  var onLoadError = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style['z-index'] = 100;
+    node.style.padding = '60px';
+    node.style.margin = '0 auto';
+    node.style['text-align'] = 'center';
+    node.style['background-color'] = 'rgba( 30, 30, 30, 0.7)';
+    node.style.position = 'fixed';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '20px';
+    node.style.color = 'tomato';
+    node.style['font-family'] = '/"Open Sans/", Arial, sans-serif;';
+    node.style['border-radius'] = '4px';
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
+  uploadForm.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    window.backend.save(new FormData(uploadForm), function () {
+      closeUploadOverlay();
+      openUploadImage();
+      uploadForm.reset();
+    }, onLoadError);
+  });
 
   // ---------- pin move ----------
   // функция нахождения позиции pin.style.left в пиксельном выражении в
