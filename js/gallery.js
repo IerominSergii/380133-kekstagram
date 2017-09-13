@@ -40,24 +40,5 @@
     cropForm.classList.add('hidden');
   };
 
-  var onLoadError = function (errorMessage) {
-    var node = document.createElement('div');
-    node.style['z-index'] = 100;
-    node.style.padding = '60px';
-    node.style.margin = '0 auto';
-    node.style['text-align'] = 'center';
-    node.style['background-color'] = 'rgba( 30, 30, 30, 0.7)';
-    node.style.position = 'fixed';
-    node.style.left = 0;
-    node.style.right = 0;
-    node.style.fontSize = '20px';
-    node.style.color = 'tomato';
-    node.style['font-family'] = '/"Open Sans/", Arial, sans-serif;';
-    node.style['border-radius'] = '4px';
-
-    node.textContent = errorMessage;
-    document.body.insertAdjacentElement('afterbegin', node);
-  };
-
-  window.backend.load(onLoadSucces, onLoadError);
+  window.backend.load(onLoadSucces, window.backend.onLoadError);
 })();
