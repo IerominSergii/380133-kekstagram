@@ -61,8 +61,6 @@
     uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
     submitButton.addEventListener('keydown', onSubmitButtonEnterPress);
 
-    // resizeInc.addEventListener('click', onResizeIncClick);// вешаю клик по кнопке "+"
-    // resizeDec.addEventListener('click', onResizeDecClick);// вешаю клик по кнопке "-"
     // вешаю обработчик клика на кнопку отправки формы
     submitButton.addEventListener('click', validateFormCustom);
 
@@ -75,7 +73,7 @@
     submitButton.addEventListener('click', becameValidAfterSubmitClick);
 
     // вешаю обработчик очистки формы
-    uploadForm.addEventListener('submit', resetForm);
+    // uploadForm.addEventListener('submit', resetForm);
 
     window.setPinDefaultPos(previewPicture, pin, effectValue);
   };
@@ -89,9 +87,6 @@
     uploadCloseButton.removeEventListener('keydown', pressEnterToCloseOverlay);
     submitButton.removeEventListener('keydown', onSubmitButtonEnterPress);
 
-    // resizeInc.removeEventListener('click', onResizeIncClick);// снимаю клик по кнопке "+"
-    // resizeDec.removeEventListener('click', onResizeDecClick);// снимаю клик по кнопке "-"
-
     // снимаю обработчик клика на кнопку отправки формы
     submitButton.removeEventListener('click', validateFormCustom);
 
@@ -104,7 +99,7 @@
     submitButton.removeEventListener('click', becameValidAfterSubmitClick);
 
     // снимаю обработчик очистки формы
-    uploadForm.removeEventListener('submit', resetForm);
+    // uploadForm.removeEventListener('submit', resetForm);
   };
 
   // функция по изменению значния поля загрузки фото
@@ -176,7 +171,7 @@
   // если фокус на крестике .upload-form-cancel
   uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
 
-  // ---------- initializeFilters----------
+  // ---------- изменения фильтра ----------
   var applyEffect = function (newFilter) {
     // удаляю все предыдущие эффекты на основной картинке
     for (var key in window.effects) {
@@ -320,11 +315,11 @@
   };
 
   // функция очистки формы после сабмита
-  var resetForm = function () {
-    if (uploadForm.validity.valid) {
-      uploadForm.reset();
-    }
-  };
+  // var resetForm = function () {
+  //   if (uploadForm.validity.valid) {
+  //     uploadForm.reset();
+  //   }
+  // };
 
   // функция валидации формы (хэш-тегов) - нестандартный валидации
   var validateFormCustom = function () {
@@ -366,6 +361,16 @@
   uploadForm.setAttribute('action', 'https://1510.dump.academy/kekstagram');
   uploadForm.setAttribute('method', 'post');
   uploadForm.setAttribute('enctype', 'multipart/form-data');
+
+  // при отправке формы использую функцию backend.save и отменяю действие формы по умолчанию
+  uploadForm.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    window.backend.save(new FormData(uploadForm), function () {
+      closeUploadOverlay();
+      openUploadImage();
+      uploadForm.reset();
+    }, window.backend.onLoadError);
+  });
 
   // ---------- pin move ----------
   // функция нахождения позиции pin.style.left в пиксельном выражении в

@@ -22,13 +22,14 @@
     // 'достаю' data- индекс из элемента
     var index = pict.dataset.index;
 
-    // по data- индексу передаю соответствующий элемент из массива в эту функцию
-    var shot = window.picture.pictures[index];
+    var onLoadSuccesSetPictureToGallery = function (images) {
+      // отрисовываю превью
+      galleryElement.querySelector('.gallery-overlay-image').setAttribute('src', images[index].url);
+      galleryElement.querySelector('.likes-count').textContent = images[index].likes;
+      galleryElement.querySelector('.comments-count').textContent = images[index].comments.length;
+    };
 
-    // отрисовываю превью
-    galleryElement.querySelector('.gallery-overlay-image').setAttribute('src', shot.url);
-    galleryElement.querySelector('.likes-count').textContent = shot.likes;
-    galleryElement.querySelector('.comments-count').textContent = shot.commentsCount;
+    window.backend.load(onLoadSuccesSetPictureToGallery, window.backend.onLoadError);
   };
 
   // функция открытия превью
