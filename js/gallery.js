@@ -2,43 +2,104 @@
 'use strict';
 
 (function () {
+  // контейнер с картинками
+  var picturesList = document.querySelector('.pictures');
+
   // блок фильтров картинок Рекомендуемые, Популярные и т.д.
   var sortBlock = document.querySelector('.filters');
 
   // коллекция input форм с эффектами
   var sortInputs = sortBlock.querySelectorAll('input');
 
-  // на входе получаю не сортированный массив из картинок
+  var removePictures = function (picturesContainer) {
+    while (picturesContainer.lastChild) {
+      picturesContainer.removeChild(picturesContainer.lastChild);
+    }
+  };
+
+  // ---------- Recommend ----------
+  // активирую фильтр Рекомендуемые
+  var turnOnRecommendFilter = function () {
+    removePictures(picturesList);
+    window.backend.load(onLoadSucces, window.backend.onLoadError);
+  };
+
+  // ---------- Popular ----------
+  // на входе получаю неотсортированный массив из картинок
   // сортирую его по убыванию количества лайков
-  var onPopularClick = function (images) {
-    var popularImages = images.slice();
+  var sortByPopular = function (shot) {
+    var popularImages = shot.slice();
     popularImages.sort(function (left, right) {
-      return left.likes - right.likes;
+      return right.likes - left.likes;
     });
 
+    return popularImages;
+  };
+
+  // заменяю функцию onLoadSucces на onLoadPopular для вызова в глобальной
+  // функции window.backend.load
+  var onLoadPopular = function (picts) {
+    var popularImages = sortByPopular(picts);
     onLoadSucces(popularImages);
   };
 
-  var onDiscussedClick = function (images) {
-    var popularImages = images.slice();
-    popularImages.sort(function (left, right) {
-      return left.likes - right.likes;
-    });
-
-    onLoadSucces(popularImages);
+  // активирую фильтр Популярные
+  var turnOnPopularFilter = function () {
+    removePictures(picturesList);
+    window.backend.load(onLoadPopular, window.backend.onLoadError);
   };
 
-  var onRandomClick = function (images) {
-    var popularImages = images.slice();
-    popularImages.sort(function (left, right) {
-      return left.likes - right.likes;
+  // ---------- Discussed ----------
+  // на входе получаю неотсортированный массив из картинок
+  // сортирую его в порядке убывания количества комментариев
+  var sortByDiscussed = function (shots) {
+    var discussedImages = shots.slice();
+    discussedImages.sort(function (left, right) {
+      return right.comments.length - left.comments.length;
     });
 
-    onLoadSucces(popularImages);
+    return discussedImages;
   };
 
-  // контейнер с картинками
-  var picturesList = document.querySelector('.pictures');
+  // заменяю функцию onLoadSucces на onLoadDiscussed для вызова в глобальной
+  // функции window.backend.load
+  var onLoadDiscussed = function (picts) {
+    var discussedImages = sortByDiscussed(picts);
+    onLoadSucces(discussedImages);
+  };
+
+  // активирую фильтр Обсуждаемые
+  var turnOnDiscussedFilter = function () {
+    removePictures(picturesList);
+    window.backend.load(onLoadDiscussed, window.backend.onLoadError);
+  };
+
+  // ---------- Random ----------
+  // функция сортировки объектов массива в случайном порядке
+  var compareRandom = function (a, b) {
+    return Math.random() - 0.5;
+  };
+
+  // на входе получаю неотсортированный массив из картинок
+  // сортирую его в случайном порядке
+  var sortByRandom = function (images) {
+    var randomImages = images.slice();
+    randomImages.sort(compareRandom);
+    return randomImages;
+  };
+
+  // заменяю функцию onLoadSucces на onLoadRandom для вызова в глобальной
+  // функции window.backend.load
+  var onLoadRandom = function (picts) {
+    var randomImages = sortByRandom(picts);
+    onLoadSucces(randomImages);
+  };
+
+  // активирую фильтр Случайные
+  var turnOnRandomFilter = function () {
+    removePictures(picturesList);
+    window.backend.load(onLoadRandom, window.backend.onLoadError);
+  };
 
   // шаблон картинки
   var similarPictureTemplate = document.querySelector('#picture-template');
@@ -79,44 +140,36 @@
     sortBlock.classList.remove('hidden');
   };
 
-  // переключателям эффекта добавляю data-атрибут с названием фильтра
-  for (var i = 0; i < sortInputs.length; i++) {
-    var sortClassName = sortInputs[i].getAttribute('id');
-    var sortName = sortClassName;
-    sortInputs[i].dataset.filter = sortName;
-
-    switch (sortName) {
-      case 'filter-recommend':
-        sortInputs[i].addEventListener(
-            'click',
-            window.backend.load(onLoadSucces, window.backend.onLoadError)
-        );
-        break;
-      case 'filter-popular':
-        sortInputs[i].addEventListener(
-            'click',
-            window.backend.load(onPopularClick, window.backend.onLoadError)
-        );
-        break;
-      case 'filter-discussed':
-        sortInputs[i].addEventListener(
-            'click',
-            window.backend.load(onDiscussedClick, window.backend.onLoadError)
-        );
-        break;
-      case 'filter-random':
-        sortInputs[i].addEventListener(
-            'click',
-            window.backend.load(onRandomClick, window.backend.onLoadError)
-        );
-        break;
-      default:
-        sortInputs[i].addEventListener(
-            'click',
-            window.backend.load(onLoadSucces, window.backend.onLoadError)
-      );
+  var setDataAttrOnFilters = function (inputs) {
+    // переключателям эффекта добавляю data-атрибут с названием фильтра
+    for (var i = 0; i < inputs.length; i++) {
+      var sortClassName = inputs[i].getAttribute('id');
+      var sortName = sortClassName;
+      inputs[i].dataset.filter = sortName;
     }
-  }
+  };
+
+  var addOnFiltersClick = function (filters) {
+    for (var i = 0; i < filters.length; i++) {
+      switch (filters[i].dataset.filter) {
+        case 'filter-recommend':
+          filters[i].addEventListener('click', turnOnRecommendFilter);
+          break;
+        case 'filter-popular':
+          filters[i].addEventListener('click', turnOnPopularFilter);
+          break;
+        case 'filter-discussed':
+          filters[i].addEventListener('click', turnOnDiscussedFilter);
+          break;
+        case 'filter-random':
+          filters[i].addEventListener('click', turnOnRandomFilter);
+          break;
+      }
+    }
+  };
+
+  setDataAttrOnFilters(sortInputs);
+  addOnFiltersClick(sortInputs);
 
   window.backend.load(onLoadSucces, window.backend.onLoadError);
 })();
