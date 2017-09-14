@@ -2,6 +2,17 @@
 'use strict';
 
 (function () {
+  // функция 'устранения дребезг' при частой нажатии
+  var DEBOUNCE_INTERVAL = 300;// ms, время на которое откладывается действие
+  var lastTimeout;
+  var debounce = function (fun) {
+    if (lastTimeout) {
+      window.clearTimeout(lastTimeout);
+    }
+
+    lastTimeout = window.setTimeout(fun, DEBOUNCE_INTERVAL);
+  };
+
   // контейнер с картинками
   var picturesList = document.querySelector('.pictures');
 
@@ -91,7 +102,7 @@
   // заменяю функцию onLoadSucces на onLoadRandom для вызова в глобальной
   // функции window.backend.load
   var onLoadRandom = function (picts) {
-    var randomImages = sortByRandom(picts);
+    var randomImages = debounce(sortByRandom);
     onLoadSucces(randomImages);
   };
 
