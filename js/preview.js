@@ -9,10 +9,10 @@
 
   // ---------- DOM элементы ----------
   // превью
-  var galleryElement = document.querySelector('.gallery-overlay');
+  var galleryOverlay = document.querySelector('.gallery-overlay');
 
   // крестик - закрытие превью
-  var galleryCloseCross = galleryElement.querySelector('.gallery-overlay-close');
+  var galleryCloseCross = galleryOverlay.querySelector('.gallery-overlay-close');
 
   // контейнер с картинками
   var picturesList = document.querySelector('.pictures');
@@ -29,9 +29,9 @@
 
     var onLoadSuccesSetPictureToGallery = function (images) {
       // отрисовываю превью
-      galleryElement.querySelector('.gallery-overlay-image').setAttribute('src', images[index].url);
-      galleryElement.querySelector('.likes-count').textContent = images[index].likes;
-      galleryElement.querySelector('.comments-count').textContent = images[index].comments.length;
+      galleryOverlay.querySelector('.gallery-overlay-image').setAttribute('src', images[index].url);
+      galleryOverlay.querySelector('.likes-count').textContent = images[index].likes;
+      galleryOverlay.querySelector('.comments-count').textContent = images[index].comments.length;
 
       // открываю превью
       galleryOpen();
@@ -43,7 +43,7 @@
   // функция открытия превью
   var galleryOpen = function () {
     // показываю превью
-    galleryElement.classList.remove('hidden');
+    galleryOverlay.classList.remove('hidden');
 
     // удаляю обработчик: клика по маленькой картинке - открытие превью
     picturesList.removeEventListener('click', onPictureClickGalleryOpen);
@@ -63,7 +63,7 @@
 
   // функция закрытия превью
   var galleryClose = function () {
-    galleryElement.classList.add('hidden');
+    galleryOverlay.classList.add('hidden');
 
     // добавляю обработчик: клика по маленькой картинке - открытие превью
     picturesList.addEventListener('click', onPictureClickGalleryOpen);

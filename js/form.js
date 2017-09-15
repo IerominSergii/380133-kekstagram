@@ -86,6 +86,7 @@
   // функция закрытия uploadOverlay
   var closeUploadOverlay = function () {
     uploadOverlay.classList.add('hidden');
+
     uploadCloseButton.removeEventListener('click', onCloseButtonClick);
     document.removeEventListener('keydown', pressEscToCloseOverlay);
     uploadFileInput.addEventListener('change', onUploadFileChange);
@@ -133,6 +134,7 @@
     evt.preventDefault();
     if (evt.keyCode === ENTER_KEYCODE) {
       closeUploadOverlay();
+      openUploadImage();
     }
   };
 
