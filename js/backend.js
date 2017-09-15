@@ -14,26 +14,26 @@
     // для того чтобы xhr.response сразу вернул объект или массив
     xhr.responseType = 'json';
 
+    xhr.timeout = 10000;// 10s - time in milliseconds
+
     // если данные загружены успешно выполнится onLoad
     // и onError, если что-то пошло не так
-    xhr.addEventListener('load', function () {
+    xhr.onload = function () {
       try {
         onLoad(xhr.response);
       } catch (err) {
         onError(err.message);
       }
-    });
+    };
 
     // обработка ошибочных ситуаций
-    xhr.addEventListener('error', function () {
+    xhr.onerror = function () {
       onError('Произошла ошибка соединения');
-    });
+    };
 
-    xhr.addEventListener('timeout', function () {
+    xhr.ontimeout = function () {
       onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
-    });
-
-    xhr.timeout = 10000;// 10s
+    };
 
     return xhr;
   };

@@ -19,97 +19,10 @@
   // блок фильтров картинок Рекомендуемые, Популярные и т.д.
   var sortBlock = document.querySelector('.filters');
 
-  // коллекция input форм с эффектами
-  var sortInputs = sortBlock.querySelectorAll('input');
-
   var removePictures = function (picturesContainer) {
     while (picturesContainer.lastChild) {
       picturesContainer.removeChild(picturesContainer.lastChild);
     }
-  };
-
-  // ---------- Recommend ----------
-  // активирую фильтр Рекомендуемые
-  var turnOnRecommendFilter = function () {
-    removePictures(picturesList);
-    window.backend.load(onLoadSucces, window.backend.onLoadError);
-  };
-
-  // ---------- Popular ----------
-  // на входе получаю неотсортированный массив из картинок
-  // сортирую его по убыванию количества лайков
-  var sortByPopular = function (shot) {
-    var popularImages = shot.slice();
-    popularImages.sort(function (left, right) {
-      return right.likes - left.likes;
-    });
-
-    return popularImages;
-  };
-
-  // заменяю функцию onLoadSucces на onLoadPopular для вызова в глобальной
-  // функции window.backend.load
-  var onLoadPopular = function (picts) {
-    var popularImages = sortByPopular(picts);
-    onLoadSucces(popularImages);
-  };
-
-  // активирую фильтр Популярные
-  var turnOnPopularFilter = function () {
-    removePictures(picturesList);
-    window.backend.load(onLoadPopular, window.backend.onLoadError);
-  };
-
-  // ---------- Discussed ----------
-  // на входе получаю неотсортированный массив из картинок
-  // сортирую его в порядке убывания количества комментариев
-  var sortByDiscussed = function (shots) {
-    var discussedImages = shots.slice();
-    discussedImages.sort(function (left, right) {
-      return right.comments.length - left.comments.length;
-    });
-
-    return discussedImages;
-  };
-
-  // заменяю функцию onLoadSucces на onLoadDiscussed для вызова в глобальной
-  // функции window.backend.load
-  var onLoadDiscussed = function (picts) {
-    var discussedImages = sortByDiscussed(picts);
-    onLoadSucces(discussedImages);
-  };
-
-  // активирую фильтр Обсуждаемые
-  var turnOnDiscussedFilter = function () {
-    removePictures(picturesList);
-    window.backend.load(onLoadDiscussed, window.backend.onLoadError);
-  };
-
-  // ---------- Random ----------
-  // функция сортировки объектов массива в случайном порядке
-  var compareRandom = function (a, b) {
-    return Math.random() - 0.5;
-  };
-
-  // на входе получаю неотсортированный массив из картинок
-  // сортирую его в случайном порядке
-  var sortByRandom = function (images) {
-    var randomImages = images.slice();
-    randomImages.sort(compareRandom);
-    return randomImages;
-  };
-
-  // заменяю функцию onLoadSucces на onLoadRandom для вызова в глобальной
-  // функции window.backend.load
-  var onLoadRandom = function (picts) {
-    var randomImages = debounce(sortByRandom);
-    onLoadSucces(randomImages);
-  };
-
-  // активирую фильтр Случайные
-  var turnOnRandomFilter = function () {
-    removePictures(picturesList);
-    window.backend.load(onLoadRandom, window.backend.onLoadError);
   };
 
   // шаблон картинки
@@ -133,8 +46,8 @@
     for (var j = 0; j < images.length; j++) {
       var currentPicture = createPictureDomElement(images[j]);
 
-      // добавляю картинке индекс - номер картинки в массиве
-      currentPicture.querySelector('.picture').dataset.index = j;
+      // добавляю картинке индекс - номер картинки в ИСХОДНОМ массиве
+      currentPicture.querySelector('.picture').dataset.index = images[j].originalNumber;
       fragment.appendChild(currentPicture);
     }
 
@@ -151,36 +64,88 @@
     sortBlock.classList.remove('hidden');
   };
 
-  var setDataAttrOnFilters = function (inputs) {
-    // переключателям эффекта добавляю data-атрибут с названием фильтра
-    for (var i = 0; i < inputs.length; i++) {
-      var sortClassName = inputs[i].getAttribute('id');
-      var sortName = sortClassName;
-      inputs[i].dataset.filter = sortName;
-    }
+  // ---------- Recommend ----------
+  // фильтр Рекомендуемые (в порядке, в котором получены с сервера)
+  var turnOnRecommendFilter = function () {
+    removePictures(picturesList);
+    onLoadSucces(album);
   };
 
-  var addOnFiltersClick = function (filters) {
-    for (var i = 0; i < filters.length; i++) {
-      switch (filters[i].dataset.filter) {
-        case 'filter-recommend':
-          filters[i].addEventListener('click', turnOnRecommendFilter);
-          break;
-        case 'filter-popular':
-          filters[i].addEventListener('click', turnOnPopularFilter);
-          break;
-        case 'filter-discussed':
-          filters[i].addEventListener('click', turnOnDiscussedFilter);
-          break;
-        case 'filter-random':
-          filters[i].addEventListener('click', turnOnRandomFilter);
-          break;
-      }
-    }
+  // ---------- Popular ----------
+  // фильтр Популярные
+  var turnOnPopularFilter = function () {
+    removePictures(picturesList);
+    var popularImages = album.slice();
+
+    // сортирую массив по убыванию количества лайков
+    popularImages.sort(function (left, right) {
+      return right.likes - left.likes;
+    });
+
+    onLoadSucces(popularImages);
   };
 
-  setDataAttrOnFilters(sortInputs);
-  addOnFiltersClick(sortInputs);
+  // ---------- Discussed ----------
+  // фильтр Обсуждаемые
+  var turnOnDiscussedFilter = function () {
+    removePictures(picturesList);
+    var discussedImages = album.slice();
 
-  window.backend.load(onLoadSucces, window.backend.onLoadError);
+    // сортирую массив в порядке убывания количества комментариев
+    discussedImages.sort(function (left, right) {
+      return right.comments.length - left.comments.length;
+    });
+
+    onLoadSucces(discussedImages);
+  };
+
+  // ---------- Random ----------
+  // функция сортировки объектов массива в случайном порядке
+  var compareRandom = function (a, b) {
+    return Math.random() - 0.5;
+  };
+
+  // фильтр Случайные
+  var turnOnRandomFilter = function () {
+    removePictures(picturesList);
+    var randomImages = album.slice();
+    randomImages.sort(compareRandom);
+    onLoadSucces(randomImages);
+  };
+
+  // вешаю обработчики событий на каждый фильтр
+  var filterRecommend = sortBlock.querySelector('#filter-recommend');
+  filterRecommend.addEventListener('click', function () {
+    debounce(turnOnRecommendFilter);
+  });
+
+  var filterPopular = sortBlock.querySelector('#filter-popular');
+  filterPopular.addEventListener('click', function () {
+    debounce(turnOnPopularFilter);
+  });
+
+  var filterDiscussed = sortBlock.querySelector('#filter-discussed');
+  filterDiscussed.addEventListener('click', function () {
+    debounce(turnOnDiscussedFilter);
+  });
+
+  var filterRandom = sortBlock.querySelector('#filter-random');
+  filterRandom.addEventListener('click', function () {
+    debounce(turnOnRandomFilter);
+  });
+
+  // функцией getAlbum буду сохранять, полученный с сервера массив картинок в album
+  // originalNumber - это номер картинки в исходном массиве. На его основе буду
+  // присваивать data-attribute
+  var album = [];
+  var getAlbum = function (photos) {
+    album = photos.map(function (photo, i) {
+      photo.originalNumber = i;
+      return photo;
+    });
+
+    onLoadSucces(album);
+  };
+
+  window.backend.load(getAlbum, window.backend.onLoadError);
 })();
