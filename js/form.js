@@ -3,8 +3,16 @@
 
 (function () {
   // ---------- константы ----------
+  var ESC_KEYCODE = 27;// кнопка ESC
+  var ENTER_KEYCODE = 13;// кнопка ENTER
+
   var COMMENT_MIN_LENGTH = 30;// минимальная длина комментария — 30 символов
   var COMMENT_MAX_LENGTH = 140;// максимальная длина комментария — 140 символов
+
+  var HASHTAG_MAX_AMOUNT = 5;// максимальное количество хэш-тегов
+  var HASHTAG_MAX_LENGTH = 20;// максимальная длина хэш-тега
+
+  var INVALID_FORM = '3px solid red';// стиль невалидной формы
 
   // ---------- переменные ----------
   // общая форма
@@ -72,9 +80,6 @@
     // если комменты валидны
     submitButton.addEventListener('click', becameValidAfterSubmitClick);
 
-    // вешаю обработчик очистки формы
-    // uploadForm.addEventListener('submit', resetForm);
-
     window.setPinDefaultPos(previewPicture, pin, effectValue);
   };
 
@@ -97,9 +102,6 @@
     // снимаю обработчик - убрать красную рамку по нажатию на кнопку Отправить
     // если комменты валидны
     submitButton.removeEventListener('click', becameValidAfterSubmitClick);
-
-    // снимаю обработчик очистки формы
-    // uploadForm.removeEventListener('submit', resetForm);
   };
 
   // функция по изменению значния поля загрузки фото
@@ -117,7 +119,7 @@
 
   // закрытие формы кадрирования uploadOverlay по нажатию ESC
   var pressEscToCloseOverlay = function (evt) {
-    if (evt.keyCode === window.data.ESC_KEYCODE && evt.target !== uploadComment) {
+    if (evt.keyCode === ESC_KEYCODE && evt.target !== uploadComment) {
       // нажата клавиша ESC?
       // если фокус находится на форме ввода комментария, то форма не закрывается
       evt.preventDefault();
@@ -129,7 +131,7 @@
   // функция закрытия формы кадрирования uploadOverlay по нажатию ENTER
   var pressEnterToCloseOverlay = function (evt) {
     evt.preventDefault();
-    if (evt.keyCode === window.data.ENTER_KEYCODE) {
+    if (evt.keyCode === ENTER_KEYCODE) {
       closeUploadOverlay();
     }
   };
@@ -139,7 +141,7 @@
 
   // функция генерации клика на нажатию ENTER на кнопке Отправить
   var onSubmitButtonEnterPress = function (evt) {
-    if (evt.keyCode === window.data.ENTER_KEYCODE) {
+    if (evt.keyCode === ENTER_KEYCODE) {
       submitButton.dispatchEvent(doClick);
     }
   };
@@ -150,9 +152,6 @@
 
   // добавление tabindex на кнопку Отправить
   submitButton.setAttribute('tabindex', '0');
-
-  // форма ввода комментария - обязательное поле
-  uploadComment.setAttribute('required', 'required');
 
   // минимальная длина комментария — 30 символов
   uploadComment.setAttribute('minlength', COMMENT_MIN_LENGTH);
@@ -171,10 +170,20 @@
   // если фокус на крестике .upload-form-cancel
   uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
 
+  // объект эффектов
+  var effects = {
+    'effect-none': null,
+    'effect-chrome': 'grayscale',
+    'effect-sepia': 'sepia',
+    'effect-marvin': 'invert',
+    'effect-phobos': 'blur',
+    'effect-heat': 'brightness',
+  };
+
   // ---------- изменения фильтра ----------
   var applyEffect = function (newFilter) {
     // удаляю все предыдущие эффекты на основной картинке
-    for (var key in window.effects) {
+    for (var key in effects) {
       if (previewPicture.classList.contains(key)) {
         previewPicture.classList.remove(key);
       }
@@ -197,17 +206,7 @@
 
   window.initializeScale(scaleElement, adjustScale);
 
-  // ---------- 6 Хэш-теги ----------
-  // ---------- константы ----------
-  // максимальное количество хэш-тегов
-  var HASHTAG_MAX_AMOUNT = 5;
-
-  // максимальная длина хэш-тега
-  var HASHTAG_MAX_LENGTH = 20;
-
-  // стиль невалидной формы
-  var INVALID_FORM = '3px solid red';
-
+  // ---------- Хэш-теги ----------
   // ---------- переменные ----------
   // поле ввода хэш-тегов
   var inputHashtag = document.querySelector('.upload-form-hashtags');
@@ -313,13 +312,6 @@
       hideInvalid(uploadComment);
     }
   };
-
-  // функция очистки формы после сабмита
-  // var resetForm = function () {
-  //   if (uploadForm.validity.valid) {
-  //     uploadForm.reset();
-  //   }
-  // };
 
   // функция валидации формы (хэш-тегов) - нестандартный валидации
   var validateFormCustom = function () {
@@ -477,7 +469,7 @@
       //
       // задаю значение фильтра в зависимости от выбранного
       // эффекта и положения ползунка
-      for (var key in window.effects) {
+      for (var key in effects) {
         if (previewPicture.classList.contains(key)) {
           var activeEffect = key;
         }

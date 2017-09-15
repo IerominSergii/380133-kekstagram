@@ -2,7 +2,7 @@
 'use strict';
 
 (function () {
-  // ---------- 4 Применение эффекта к изображению ----------
+  // ---------- Применение эффекта к изображению ----------
   // ---------- константа ----------
   // название CSS класса - это название фильтра без префикса 'upload-'
   var PREFIX = 'upload-';
@@ -39,16 +39,6 @@
   // прячу блок уровня эффекта (по-умолчанию)
   effectLevelBlock.classList.add('hidden');
 
-  // объект эффектов
-  window.effects = {
-    'effect-none': null,
-    'effect-chrome': 'grayscale',
-    'effect-sepia': 'sepia',
-    'effect-marvin': 'invert',
-    'effect-phobos': 'blur',
-    'effect-heat': 'brightness',
-  };
-
   // функция: задаю основной картинке CSS фильтр
   // в зависимости от выбранного эффекта и положения ползунка
   window.setEffect = function (currentEffect, pinPositionInPersent) {
@@ -79,18 +69,18 @@
     var onEffectInputClick = function (evt) {
       var target = evt.target;
 
+      window.setPinDefaultPos(previewPicture, pin, effectValue);
+
+      window.setEffect(target.dataset.effect, pin.style.left);
+
+      applyFilter(target.dataset.effect);
+
       // если фильтр не выбран, то ползунок - скрыт
       if (previewPicture.classList.contains('effect-none')) {
         effectLevelBlock.classList.add('hidden');
       } else {
         effectLevelBlock.classList.remove('hidden');
       }
-
-      window.setPinDefaultPos(previewPicture, pin, effectValue);
-
-      window.setEffect(target.dataset.effect, pin.style.left);
-
-      applyFilter(target.dataset.effect);
     };
 
     // коллекция input форм с эффектами
