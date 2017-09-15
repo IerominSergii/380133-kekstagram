@@ -53,15 +53,6 @@
 
     // перемещаю fragment в контейнер с картинками .pictures
     picturesList.appendChild(fragment);
-
-    // форма кадрирования изображения upload-overlay
-    var cropForm = document.querySelector('.upload-overlay');
-
-    // скрываю форму кадрирования изображения upload-overlay
-    cropForm.classList.add('hidden');
-
-    // показываю блок фильтров картинок Рекомендуемые, Популярные и т.д.
-    sortBlock.classList.remove('hidden');
   };
 
   // ---------- Recommend ----------
@@ -75,10 +66,9 @@
   // фильтр Популярные
   var turnOnPopularFilter = function () {
     removePictures(picturesList);
-    var popularImages = album.slice();
 
-    // сортирую массив по убыванию количества лайков
-    popularImages.sort(function (left, right) {
+    // копирую и сортирую массив по убыванию количества лайков
+    var popularImages = album.slice().sort(function (left, right) {
       return right.likes - left.likes;
     });
 
@@ -89,10 +79,9 @@
   // фильтр Обсуждаемые
   var turnOnDiscussedFilter = function () {
     removePictures(picturesList);
-    var discussedImages = album.slice();
 
-    // сортирую массив в порядке убывания количества комментариев
-    discussedImages.sort(function (left, right) {
+    // копирую и сортирую массив в порядке убывания количества комментариев
+    var discussedImages = album.slice().sort(function (left, right) {
       return right.comments.length - left.comments.length;
     });
 
@@ -108,8 +97,7 @@
   // фильтр Случайные
   var turnOnRandomFilter = function () {
     removePictures(picturesList);
-    var randomImages = album.slice();
-    randomImages.sort(compareRandom);
+    var randomImages = album.slice().sort(compareRandom);
     onLoadSucces(randomImages);
   };
 
@@ -134,6 +122,11 @@
     debounce(turnOnRandomFilter);
   });
 
+  // показываю блок фильтров картинок Рекомендуемые, Популярные и т.д.
+  var showSortBlock = function () {
+    sortBlock.classList.remove('hidden');
+  };
+
   // функцией getAlbum буду сохранять, полученный с сервера массив картинок в album
   // originalNumber - это номер картинки в исходном массиве. На его основе буду
   // присваивать data-attribute
@@ -145,6 +138,7 @@
     });
 
     onLoadSucces(album);
+    showSortBlock();
   };
 
   window.backend.load(getAlbum, window.backend.onLoadError);

@@ -4,8 +4,8 @@
 (function () {
   // ---------- константы ----------
   // кнопки клавиатуры
-  var ESC_KEYCODE = 27;
-  var ENTER_KEYCODE = 13;
+  var ESC_KEYCODE = 27;// кнопка ESC
+  var ENTER_KEYCODE = 13;// кнопка ENTER
 
   // ---------- DOM элементы ----------
   // превью

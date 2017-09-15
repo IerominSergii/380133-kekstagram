@@ -3,13 +3,16 @@
 
 (function () {
   // ---------- константы ----------
-  // кнопки клавиатуры
-  var ESC_KEYCODE = 27;
-  var ENTER_KEYCODE = 13;
+  var ESC_KEYCODE = 27;// кнопка ESC
+  var ENTER_KEYCODE = 13;// кнопка ENTER
 
-  // ---------- константы ----------
   var COMMENT_MIN_LENGTH = 30;// минимальная длина комментария — 30 символов
   var COMMENT_MAX_LENGTH = 140;// максимальная длина комментария — 140 символов
+
+  var HASHTAG_MAX_AMOUNT = 5;// максимальное количество хэш-тегов
+  var HASHTAG_MAX_LENGTH = 20;// максимальная длина хэш-тега
+
+  var INVALID_FORM = '3px solid red';// стиль невалидной формы
 
   // ---------- переменные ----------
   // общая форма
@@ -150,9 +153,6 @@
   // добавление tabindex на кнопку Отправить
   submitButton.setAttribute('tabindex', '0');
 
-  // форма ввода комментария - обязательное поле
-  uploadComment.setAttribute('required', 'required');
-
   // минимальная длина комментария — 30 символов
   uploadComment.setAttribute('minlength', COMMENT_MIN_LENGTH);
 
@@ -170,10 +170,20 @@
   // если фокус на крестике .upload-form-cancel
   uploadCloseButton.addEventListener('keydown', pressEnterToCloseOverlay);
 
+  // объект эффектов
+  var effects = {
+    'effect-none': null,
+    'effect-chrome': 'grayscale',
+    'effect-sepia': 'sepia',
+    'effect-marvin': 'invert',
+    'effect-phobos': 'blur',
+    'effect-heat': 'brightness',
+  };
+
   // ---------- изменения фильтра ----------
   var applyEffect = function (newFilter) {
     // удаляю все предыдущие эффекты на основной картинке
-    for (var key in window.effects) {
+    for (var key in effects) {
       if (previewPicture.classList.contains(key)) {
         previewPicture.classList.remove(key);
       }
@@ -196,17 +206,7 @@
 
   window.initializeScale(scaleElement, adjustScale);
 
-  // ---------- 6 Хэш-теги ----------
-  // ---------- константы ----------
-  // максимальное количество хэш-тегов
-  var HASHTAG_MAX_AMOUNT = 5;
-
-  // максимальная длина хэш-тега
-  var HASHTAG_MAX_LENGTH = 20;
-
-  // стиль невалидной формы
-  var INVALID_FORM = '3px solid red';
-
+  // ---------- Хэш-теги ----------
   // ---------- переменные ----------
   // поле ввода хэш-тегов
   var inputHashtag = document.querySelector('.upload-form-hashtags');
@@ -469,7 +469,7 @@
       //
       // задаю значение фильтра в зависимости от выбранного
       // эффекта и положения ползунка
-      for (var key in window.effects) {
+      for (var key in effects) {
         if (previewPicture.classList.contains(key)) {
           var activeEffect = key;
         }

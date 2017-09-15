@@ -2,7 +2,7 @@
 'use strict';
 
 (function () {
-  // ---------- 4 Применение эффекта к изображению ----------
+  // ---------- Применение эффекта к изображению ----------
   // ---------- константа ----------
   // название CSS класса - это название фильтра без префикса 'upload-'
   var PREFIX = 'upload-';
@@ -38,16 +38,6 @@
 
   // прячу блок уровня эффекта (по-умолчанию)
   effectLevelBlock.classList.add('hidden');
-
-  // объект эффектов
-  window.effects = {
-    'effect-none': null,
-    'effect-chrome': 'grayscale',
-    'effect-sepia': 'sepia',
-    'effect-marvin': 'invert',
-    'effect-phobos': 'blur',
-    'effect-heat': 'brightness',
-  };
 
   // функция: задаю основной картинке CSS фильтр
   // в зависимости от выбранного эффекта и положения ползунка
